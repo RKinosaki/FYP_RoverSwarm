@@ -1,34 +1,96 @@
 #include <Arduino.h>
-#include <VL53L1X.h>
-#include <Wire.h>
 
-#define ToF_SDA_L 12
-#define ToF_SCL_L 9
+#include "task.h"
+#include "FreeRTOS.h"
+#include "config.h"
 
-TwoWire TL = TwoWire(0);
-VL53L1X ToF_L;
+#define IMU_SDA 4
+#define IMU_SCL 5
+
+
+
+void scanI2C() {
+  Serial.println("Scanning I2C bus...");
+  uint8_t count = 0;
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if (Wire.endTransmission() == 0) {
+      Serial.print("I2C device found at 0x");
+      if (addr < 16) Serial.print("0");
+      Serial.println(addr, HEX);
+      count++;
+    }
+  }
+  if (count == 0) {
+    Serial.println("No I2C devices found.");
+  }
+  Serial.println("");
+  delay(2000);
+}
 
 void setup() {
   Serial.begin(115200);
-  TL.begin(ToF_SDA_L, ToF_SCL_L);
-  TL.setClock(400000);
-  ToF_L.setBus(&TL);
-  ToF_L.setTimeout(500);
-  if (!ToF_L.init()){
-    Serial.println("Failed to detect and initalise sensor!");
-    while(1);
-  }
-  ToF_L.setDistanceMode(VL53L1X::Short);
-  ToF_L.setMeasurementTimingBudget(20000);
-  ToF_L.startContinuous(20);
-  
+
+  //Create Tasks//
+  #if LED_ENABLE
+    xTaskCreate(
+      ledIndicate,        //Function Name
+      "LED",              //Text Name
+      2500,               //Stack size (bytes)
+      NULL,               //Parameters
+      LED_PRIORITY,       // Priority
+      &ledIndicate        // Pointer
+    );
+  #endif
+
+  #if OBST_ENABLE
+    xTaskCreate(
+      measureObst,                 //Function Name
+      "Obstacle",                 //Text Name
+      2500,                       //Stack size (bytes)
+      NULL,                       //Parameters
+      OBST_PRIORITY,              // Priority
+      &measureObst                 // Pointer
+    );
+  #endif
+
+  #if ORIENTATION_ENABLE
+    xTaskCreate(
+      measureOrientation,         //Function Name
+      "Orientation",              //Text Name
+      2500,                       //Stack size (bytes)
+      NULL,                       //Parameters
+      ORIENTATION_PRIORITY,       // Priority
+      &measureOrientation         // Pointer
+    );
+  #endif
+
+  #if DISTANCE_ENABLE
+  xTaskCreate(
+    measureDistance,              //Function Name
+    "Distance",                   //Text Name
+    2500,                       //Stack size (bytes)
+    NULL,                         //Parameters
+    DISTANCE_PRIORITY,            // Priority
+    &measureDistance             // Pointer
+  );
+#endif
+
+#if PHOTON_ENABLE
+xTaskCreate(
+  measurePhoton,              //Function Name
+  "PHOTON",                   //Text Name
+  2500,                       //Stack size (bytes)
+  NULL,                         //Parameters
+  PHOTON_PRIORITY,            // Priority
+  &measurePhoton             // Pointer
+);
+#endif
+
+
 }
 
 void loop() {
-  Serial.println("Start Loop");
-  Serial.println(ToF_L.read());
-  if(ToF_L.timeoutOccurred()){
-    Serial.print(" TIMEOUT");
-    Serial.println();
-  }
+
+  vTaskDelay(pdMS_TO_TICKS(1000));
 }

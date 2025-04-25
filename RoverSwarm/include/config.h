@@ -1,0 +1,37 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#include <Arduino.h>
+
+// === TASKS === //
+// LED Task
+#define LED_ENABLE true
+#define LED_FREQ 1
+#define LED_PRIORITY 5
+
+// OBST task
+#define OBST_ENABLE true
+#define OBST_FREQ 1
+#define OBST_PRIORITY 2
+
+
+// ORIENTATION task
+#define ORIENTATION_ENABLE true
+#define ORIENTATION_FREQ 1
+#define ORIENTATION_PRIORITY 4
+
+#define ORIENTATION_ACCEL_RANGE MPU6050_RANGE_4_G
+#define ORIENTATION_GYRO_RANGE MPU6050_RANGE_250_DEG
+#define ORIENTATION_BANDWIDTH MPU6050_BAND_21_HZ
+
+// DISTANCE task
+#define DISTANCE_ENABLE true
+#define DISTANCE_FREQ 100
+#define DISTANCE_PRIORITY 1
+
+// PHOTON task
+#define PHOTON_ENABLE true
+#define PHOTON_FREQ 20
+#define PHOTON_PRIORITY 3
+
+#endif
