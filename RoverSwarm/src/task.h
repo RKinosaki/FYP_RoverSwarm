@@ -10,30 +10,16 @@ extern TaskHandle_t ledTaskHandle;
 extern TaskHandle_t orientationTaskHandle;
 extern TaskHandle_t distanceRTaskHandle;
 extern TaskHandle_t distanceLTaskHandle;
-extern TaskHandle_t reflectTaskHandle;
+// extern TaskHandle_t reflectTaskHandle;
 
 /*<-----    Task functions  ----->*/
 
-void measureObst(void *pvParameter);
 void measureOrientation(void *pvParameter);
 void measureDistanceR(void *pvParameter);
 void measureDistanceL(void *pvParameter);
-void measurePhoton(void *pvParameter);
-void ledIndicate(void *pvParameter);
+// void measurePhoton(void *pvParameter);
+// void ledIndicate(void *pvParameter);
 
-
-/*<-----    Shared variables    ----->*/
-uint16_t obstacleLeft;
-uint16_t obstacleRight;
-uint16_t pitch;
-uint16_t roll;
-uint16_t yaw;
-float distanceL;
-float distanceR;
-uint16_t photon0;
-uint16_t photon1;
-uint16_t photon2;
-uint16_t photon3;
 
 /*<-----    Shared structs  ----->*/
 typedef enum MessageType {

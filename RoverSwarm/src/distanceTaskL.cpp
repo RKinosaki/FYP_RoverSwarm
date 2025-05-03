@@ -4,54 +4,53 @@
 #include <VL53L1X.h>
 #include <Wire.h>
 
-#define ToF_SDA 4
-#define ToF_SCL 5
+#define ToF_L_SDA 4
+#define ToF_L_SCL 5
 
-TwoWire TL = TwoWire(0);
-VL53L1X ToF;
+TwoWire TL2 = TwoWire(0);
+VL53L1X ToF_L;
 
 // === GLOBAL VARIABLES === //
-
+extern float distanceL;
 // Task handles
 TaskHandle_t distanceLTaskHandle = nullptr;
 
-void setupDist() {
-  TL.begin(ToF_SDA, ToF_SCL);
-  TL.setClock(400000);
-  ToF.setBus(&TL);
-  ToF.setTimeout(500);
-  if (!ToF.init()){
+void setupDistL() {
+  TL2.begin(ToF_L_SDA, ToF_L_SCL);
+  TL2.setClock(400000);
+  ToF_L.setBus(&TL2);
+  if (!ToF_L.init()){
     Serial.println("Failed to detect and initalise sensor!");
     while(1);
   }
-  ToF.setDistanceMode(VL53L1X::Short);
-  ToF.setMeasurementTimingBudget(20000);
-  ToF.startContinuous(20);
+  ToF_L.setDistanceMode(VL53L1X::Short);
+  ToF_L.setMeasurementTimingBudget(20000);
+  ToF_L.startContinuous(20);
   
 }
 
-float measureDist() {
-    float distance = ToF.read();
-    if(ToF.timeoutOccurred()){
+void measureDistL() {
+    distanceL = ToF_L.read();
+    if(ToF_L.timeoutOccurred()){
         Serial.print(" TIMEOUT");
         Serial.println();
     }
-    return distance;
 }
 
 void measureDistanceL(void *pvParameters) {
     (void)pvParameters;
 
     /* Make the task execute at a specified frequency */
-    const TickType_t xFrequency = configTICK_RATE_HZ / ORIENTATION_FREQ;
+    const TickType_t xFrequency = configTICK_RATE_HZ / DISTANCE_FREQ_L;
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    setupDist(); //sets up the parameter for ToF Sensor
+    setupDistL(); //sets up the parameter for ToF Sensor
     Serial.println("Set up measureDistanceTask");
 
     for (;;)
     {
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
-        //put the distance value 
-        distanceL = measureDist();
+        measureDistL();
+        Serial.println("Left:");
+        Serial.print(distanceL);
     }
 }

@@ -8,7 +8,18 @@
 #include "freertos/task.h"
 
 
+//global variables
 
+/*<-----    Shared variables    ----->*/
+uint16_t pitch;
+uint16_t roll;
+uint16_t yaw;
+float distanceL;
+float distanceR;
+// uint16_t photon0;
+// uint16_t photon1;
+// uint16_t photon2;
+// uint16_t photon3;
 
 
 void scanI2C() {
@@ -32,17 +43,17 @@ void scanI2C() {
 
 void setup() {
   Serial.begin(115200);
-
+  scanI2C();
   //Create Tasks//
   #if LED_ENABLE
-    xTaskCreate(
-      ledIndicate,        //Function Name
-      "LED",              //Text Name
-      2500,               //Stack size (bytes)
-      NULL,               //Parameters
-      LED_PRIORITY,       // Priority
-      &ledTaskHandle        // Pointer
-    );
+    // xTaskCreate(
+    //   ledIndicate,        //Function Name
+    //   "LED",              //Text Name
+    //   2500,               //Stack size (bytes)
+    //   NULL,               //Parameters
+    //   LED_PRIORITY,       // Priority
+    //   &ledTaskHandle        // Pointer
+    // );
   #endif
 
 
@@ -57,41 +68,45 @@ void setup() {
     );
   #endif
 
-  #if DISTANCE_ENABLE
+  #if DISTANCE_ENABLE_R
   xTaskCreate(
-    measureDistanceL,              //Function Name
-    "Distance",                   //Text Name
-    2500,                       //Stack size (bytes)
+    measureDistanceR,              //Function Name
+    "DistanceRight",                   //Text Name
+    5000,                       //Stack size (bytes)
     NULL,                         //Parameters
-    DISTANCE_PRIORITY,            // Priority
+    DISTANCE_PRIORITY_R,            // Priority
     &distanceRTaskHandle             // Pointer
   );
 
+  #endif
+
+  #if DISTANCE_ENABLE_L
+
   xTaskCreate(
-    measureDistanceR,              //Function Name
-    "Distance",                   //Text Name
-    2500,                       //Stack size (bytes)
+    measureDistanceL,              //Function Name
+    "DistanceLeft",                   //Text Name
+    5000,                       //Stack size (bytes)
     NULL,                         //Parameters
-    DISTANCE_PRIORITY,            // Priority
+    DISTANCE_PRIORITY_L,            // Priority
     &distanceLTaskHandle             // Pointer
   );
 #endif
 
 #if PHOTON_ENABLE
-xTaskCreate(
-  measurePhoton,              //Function Name
-  "PHOTON",                   //Text Name
-  2500,                       //Stack size (bytes)
-  NULL,                         //Parameters
-  PHOTON_PRIORITY,            // Priority
-  &reflectTaskHandle             // Pointer
-);
+// xTaskCreate(
+//   measurePhoton,              //Function Name
+//   "PHOTON",                   //Text Name
+//   2500,                       //Stack size (bytes)
+//   NULL,                         //Parameters
+//   PHOTON_PRIORITY,            // Priority
+//   &reflectTaskHandle             // Pointer
+// );
 #endif
 
 
 }
 
 void loop() {
-
+  Serial.println("Starting Loop...");
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
