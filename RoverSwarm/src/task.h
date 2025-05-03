@@ -16,7 +16,8 @@ extern TaskHandle_t reflectTaskHandle;
 
 void measureObst(void *pvParameter);
 void measureOrientation(void *pvParameter);
-void measureDistance(void *pvParameter);
+void measureDistanceR(void *pvParameter);
+void measureDistanceL(void *pvParameter);
 void measurePhoton(void *pvParameter);
 void ledIndicate(void *pvParameter);
 
@@ -27,7 +28,8 @@ uint16_t obstacleRight;
 uint16_t pitch;
 uint16_t roll;
 uint16_t yaw;
-uint16_t distance;
+float distanceL;
+float distanceR;
 uint16_t photon0;
 uint16_t photon1;
 uint16_t photon2;

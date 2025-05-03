@@ -62,7 +62,7 @@ void measureParam(){
 }
 
 //--------TASK--------
-void serialTask(void *pvParameters) {
+void measureOrientation(void *pvParameters) {
     (void)pvParameters;
 
     /* Make the task execute at a specified frequency */

@@ -59,7 +59,7 @@ void setup() {
 
   #if DISTANCE_ENABLE
   xTaskCreate(
-    measureDistance,              //Function Name
+    measureDistanceL,              //Function Name
     "Distance",                   //Text Name
     2500,                       //Stack size (bytes)
     NULL,                         //Parameters
@@ -68,7 +68,7 @@ void setup() {
   );
 
   xTaskCreate(
-    measureDistance,              //Function Name
+    measureDistanceR,              //Function Name
     "Distance",                   //Text Name
     2500,                       //Stack size (bytes)
     NULL,                         //Parameters
