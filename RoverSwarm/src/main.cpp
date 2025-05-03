@@ -3,9 +3,11 @@
 #include "task.h"
 #include "FreeRTOS.h"
 #include "config.h"
+#include "Wire.h"
 
-#define IMU_SDA 4
-#define IMU_SCL 5
+#include "freertos/task.h"
+
+
 
 
 
@@ -39,20 +41,10 @@ void setup() {
       2500,               //Stack size (bytes)
       NULL,               //Parameters
       LED_PRIORITY,       // Priority
-      &ledIndicate        // Pointer
+      &ledTaskHandle        // Pointer
     );
   #endif
 
-  #if OBST_ENABLE
-    xTaskCreate(
-      measureObst,                 //Function Name
-      "Obstacle",                 //Text Name
-      2500,                       //Stack size (bytes)
-      NULL,                       //Parameters
-      OBST_PRIORITY,              // Priority
-      &measureObst                 // Pointer
-    );
-  #endif
 
   #if ORIENTATION_ENABLE
     xTaskCreate(
@@ -61,7 +53,7 @@ void setup() {
       2500,                       //Stack size (bytes)
       NULL,                       //Parameters
       ORIENTATION_PRIORITY,       // Priority
-      &measureOrientation         // Pointer
+      &orientationTaskHandle         // Pointer
     );
   #endif
 
@@ -72,7 +64,16 @@ void setup() {
     2500,                       //Stack size (bytes)
     NULL,                         //Parameters
     DISTANCE_PRIORITY,            // Priority
-    &measureDistance             // Pointer
+    &distanceRTaskHandle             // Pointer
+  );
+
+  xTaskCreate(
+    measureDistance,              //Function Name
+    "Distance",                   //Text Name
+    2500,                       //Stack size (bytes)
+    NULL,                         //Parameters
+    DISTANCE_PRIORITY,            // Priority
+    &distanceLTaskHandle             // Pointer
   );
 #endif
 
@@ -83,7 +84,7 @@ xTaskCreate(
   2500,                       //Stack size (bytes)
   NULL,                         //Parameters
   PHOTON_PRIORITY,            // Priority
-  &measurePhoton             // Pointer
+  &reflectTaskHandle             // Pointer
 );
 #endif
 

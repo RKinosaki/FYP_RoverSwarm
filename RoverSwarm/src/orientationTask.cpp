@@ -6,10 +6,13 @@
 
 Adafruit_MPU6050 imu;  //Initialise Object
 
+#define IMU_SDA 8
+#define IMU_SCL 9
+
 // === GLOBAL VARIABLES === //
 
 // Task handles
-TaskHandle_t serialTaskHandle = nullptr;
+TaskHandle_t orientationTaskHandle = nullptr;
 
 
 void setupIMU(){

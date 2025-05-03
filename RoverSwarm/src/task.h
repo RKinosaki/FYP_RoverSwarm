@@ -6,11 +6,11 @@
 
 
 /*<-----    Task handles    ----->*/
-extern TaskHandle_t ledIndicate;
-extern TaskHandle_t measureObst;
-extern TaskHandle_t measureOrientation;
-extern TaskHandle_t measureDistance;
-extern TaskHandle_t measurePhoton;
+extern TaskHandle_t ledTaskHandle;
+extern TaskHandle_t orientationTaskHandle;
+extern TaskHandle_t distanceRTaskHandle;
+extern TaskHandle_t distanceLTaskHandle;
+extern TaskHandle_t reflectTaskHandle;
 
 /*<-----    Task functions  ----->*/
 
