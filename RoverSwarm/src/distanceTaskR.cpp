@@ -13,6 +13,8 @@ VL53L1X ToF_R;
 // === GLOBAL VARIABLES === //
 extern float distanceR;
 
+extern SemaphoreHandle_t mutex;
+
 // Task handles
 TaskHandle_t distanceRTaskHandle = nullptr;
 
@@ -30,12 +32,13 @@ void setupDistR() {
   
 }
 
-void measureDistR() {
-    distanceR = ToF_R.read();
+float measureDistR() {
+    float distanceR = ToF_R.read();
     if(ToF_R.timeoutOccurred()){
         Serial.print(" TIMEOUT");
-        Serial.println();
+        distanceR = -1;
     }
+  return distanceR;
 }
 
 void measureDistanceR(void *pvParameters) {
@@ -50,7 +53,10 @@ void measureDistanceR(void *pvParameters) {
     for (;;)
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      measureDistR();
+      xSemaphoreTake(mutex, portMAX_DELAY);
+      distanceR = measureDistR();
+      xSemaphoreGive(mutex);
+
       Serial.println("Right:");
       Serial.print(distanceR);
     }

@@ -4,7 +4,8 @@
 #include "WiFi.h"
 
 // === GLOBAL VARIABLES === //
-
+extern SemaphoreHandle_t mutex;
+extern float distanceR;
 // Task handles
 TaskHandle_t sendDataTaskHandle = nullptr;
 extern WiFiClient client;
@@ -20,6 +21,9 @@ void sendData(void *pvParameters) {
     for (;;)
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      client.write("Hello");
+      xSemaphoreTake(mutex, portMAX_DELAY);
+      float localDistanceR = distanceR;
+      xSemaphoreGive(mutex);
+      client.write(distanceR);
     }
 }

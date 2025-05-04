@@ -27,6 +27,8 @@ float distanceR;
 // uint16_t photon2;
 // uint16_t photon3;
 
+SemaphoreHandle_t mutex;
+
 
 void scanI2C() {
   Serial.println("Scanning I2C bus...");
@@ -58,8 +60,9 @@ void setupCommunication(){
 
   Serial.println("\nConnected to network!:");
   Serial.println(WiFi.localIP());
+  WiFi.setTxPower(WIFI_POWER_7dBm);
 
-  while(!client.connect(IPAddress(192,168,17,151), 10000)){
+  while(!client.connect(IPAddress(192,168,75,151), 10000)){
     Serial.println("Connection to host failed");
     delay(1000);
   }
@@ -143,6 +146,7 @@ void setup() {
 #endif
 
 
+mutex = xSemaphoreCreateMutex();
 }
 
 void loop() {
