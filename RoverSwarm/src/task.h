@@ -10,6 +10,7 @@ extern TaskHandle_t ledTaskHandle;
 extern TaskHandle_t orientationTaskHandle;
 extern TaskHandle_t distanceRTaskHandle;
 extern TaskHandle_t distanceLTaskHandle;
+extern TaskHandle_t sendDataTaskHandle;
 // extern TaskHandle_t reflectTaskHandle;
 
 /*<-----    Task functions  ----->*/
@@ -17,6 +18,7 @@ extern TaskHandle_t distanceLTaskHandle;
 void measureOrientation(void *pvParameter);
 void measureDistanceR(void *pvParameter);
 void measureDistanceL(void *pvParameter);
+void sendData(void *pvParameter);
 // void measurePhoton(void *pvParameter);
 // void ledIndicate(void *pvParameter);
 

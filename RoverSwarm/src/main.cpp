@@ -4,8 +4,14 @@
 #include "FreeRTOS.h"
 #include "config.h"
 #include "Wire.h"
+#include "WiFi.h"
 
 #include "freertos/task.h"
+
+//Credientials for mobile hotspot
+const char* ssid = "Rees";
+const char* password = "password42";
+WiFiClient client;
 
 
 //global variables
@@ -41,9 +47,30 @@ void scanI2C() {
   delay(2000);
 }
 
+void setupCommunication(){
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to network...");
+
+  while(WiFi.status() != WL_CONNECTED){
+    Serial.print(".");
+    delay(100);
+  }
+
+  Serial.println("\nConnected to network!:");
+  Serial.println(WiFi.localIP());
+
+  while(!client.connect(IPAddress(192,168,17,151), 10000)){
+    Serial.println("Connection to host failed");
+    delay(1000);
+  }
+  Serial.println("Connected to server!");
+}
+
 void setup() {
   Serial.begin(115200);
-  scanI2C();
+
+  setupCommunication();
+  // scanI2C(); Scan I2c for debugging
   //Create Tasks//
   #if LED_ENABLE
     // xTaskCreate(
@@ -90,7 +117,19 @@ void setup() {
     DISTANCE_PRIORITY_L,            // Priority
     &distanceLTaskHandle             // Pointer
   );
-#endif
+  #endif
+
+  #if SEND_DATA
+
+  xTaskCreate(
+    sendData,
+  "SendData",
+  2500,
+  NULL,
+  DATA_PRIORITY,
+  &sendDataTaskHandle
+);
+  #endif
 
 #if PHOTON_ENABLE
 // xTaskCreate(
