@@ -21,13 +21,13 @@
 #define ORIENTATION_BANDWIDTH MPU6050_BAND_21_HZ
 
 //SendData Task
-#define SEND_DATA false
+#define SEND_DATA true
 #define DATA_FREQ 4
 #define DATA_PRIORITY 2
 
 // DISTANCE task left
 #define DISTANCE_ENABLE_L true
-#define DISTANCE_FREQ_L 4
+#define DISTANCE_FREQ_L 10
 #define DISTANCE_PRIORITY_L 1
 
 // PHOTON task

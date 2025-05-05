@@ -73,7 +73,7 @@ void setup() {
     Serial.println("Failed to create mutex!");
     }
   setupI2C();
-  // setupCommunication();
+  setupCommunication();
   
   
 

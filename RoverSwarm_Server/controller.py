@@ -3,7 +3,7 @@ import socket
 ##create tcp socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ##address found from the ip seen on phone hotspot
-server_address = ('192.168.75.151', 10000)
+server_address = ('192.168.1.159', 10000)
 print('starting up on ', server_address)
 sock.bind(server_address)
 sock.listen(10)

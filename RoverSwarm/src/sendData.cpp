@@ -21,7 +21,9 @@ void sendData(void *pvParameters) {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
       int16_t localDistanceR = RoverState.distanceR;
+      int16_t localDistanceL = RoverState.distanceL;
       xSemaphoreGive(RoverState.mutex);
-      client.write(RoverState.distanceR);
+      client.write(localDistanceR);
+      client.write(localDistanceL);
     }
 }
