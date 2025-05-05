@@ -1,34 +1,22 @@
 #include <Arduino.h>
-
 #include "task.h"
 #include "FreeRTOS.h"
 #include "config.h"
 #include "Wire.h"
 #include "WiFi.h"
+#include "TCA9548A.h"
 
 #include "freertos/task.h"
 
 //Credientials for mobile hotspot
 const char* ssid = "Rees";
 const char* password = "password42";
+
+//Constructor declarations
 WiFiClient client;
+TCA9548A I2CMux;
 
-
-//global variables
-
-/*<-----    Shared variables    ----->*/
-uint16_t pitch;
-uint16_t roll;
-uint16_t yaw;
-float distanceL;
-float distanceR;
-// uint16_t photon0;
-// uint16_t photon1;
-// uint16_t photon2;
-// uint16_t photon3;
-
-SemaphoreHandle_t mutex;
-
+sysState RoverState;
 
 void scanI2C() {
   Serial.println("Scanning I2C bus...");
@@ -69,11 +57,26 @@ void setupCommunication(){
   Serial.println("Connected to server!");
 }
 
+void setupI2C(){
+  Serial.println("Setting up I2C..");
+  Wire.begin(13, 12);
+  I2CMux.begin(Wire);
+  I2CMux.closeAll();
+}
+
 void setup() {
   Serial.begin(115200);
 
-  setupCommunication();
-  // scanI2C(); Scan I2c for debugging
+  RoverState.mutex = xSemaphoreCreateMutex();
+
+  if(RoverState.mutex == NULL){
+    Serial.println("Failed to create mutex!");
+    }
+  setupI2C();
+  // setupCommunication();
+  
+  
+
   //Create Tasks//
   #if LED_ENABLE
     // xTaskCreate(
@@ -96,18 +99,6 @@ void setup() {
       ORIENTATION_PRIORITY,       // Priority
       &orientationTaskHandle         // Pointer
     );
-  #endif
-
-  #if DISTANCE_ENABLE_R
-  xTaskCreate(
-    measureDistanceR,              //Function Name
-    "DistanceRight",                   //Text Name
-    5000,                       //Stack size (bytes)
-    NULL,                         //Parameters
-    DISTANCE_PRIORITY_R,            // Priority
-    &distanceRTaskHandle             // Pointer
-  );
-
   #endif
 
   #if DISTANCE_ENABLE_L
@@ -146,10 +137,11 @@ void setup() {
 #endif
 
 
-mutex = xSemaphoreCreateMutex();
+
 }
 
 void loop() {
+  // scanI2C(); //Scan I2c for debugging
   Serial.println("Starting Loop...");
   vTaskDelay(pdMS_TO_TICKS(1000));
 }

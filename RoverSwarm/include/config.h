@@ -21,7 +21,7 @@
 #define ORIENTATION_BANDWIDTH MPU6050_BAND_21_HZ
 
 //SendData Task
-#define SEND_DATA true
+#define SEND_DATA false
 #define DATA_FREQ 4
 #define DATA_PRIORITY 2
 
@@ -29,14 +29,14 @@
 #define DISTANCE_ENABLE_L true
 #define DISTANCE_FREQ_L 4
 #define DISTANCE_PRIORITY_L 1
-// DISTANCE task right
-#define DISTANCE_ENABLE_R true
-#define DISTANCE_FREQ_R 4
-#define DISTANCE_PRIORITY_R 1
 
 // PHOTON task
 #define PHOTON_ENABLE false
 #define PHOTON_FREQ 20
 #define PHOTON_PRIORITY 3
+
+// I2C Pins
+#define SDA 14
+#define SCL 13
 
 #endif
