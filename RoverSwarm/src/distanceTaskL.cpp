@@ -58,7 +58,7 @@ int16_t measureDistL() {
   return distanceL;
 }
 
-void measureDistanceL(void *pvParameters) {
+void measureSensor(void *pvParameters) {
     (void)pvParameters;
 
     /* Make the task execute at a specified frequency */

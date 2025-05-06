@@ -104,12 +104,12 @@ void setup() {
   #if DISTANCE_ENABLE_L
 
   xTaskCreate(
-    measureDistanceL,              //Function Name
+    measureSensor,              //Function Name
     "DistanceLeft",                   //Text Name
     5000,                       //Stack size (bytes)
     NULL,                         //Parameters
     DISTANCE_PRIORITY_L,            // Priority
-    &distanceLTaskHandle             // Pointer
+    &I2CTaskHandle             // Pointer
   );
   #endif
 

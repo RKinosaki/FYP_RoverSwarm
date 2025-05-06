@@ -2,20 +2,21 @@
 #define TASK_H
 
 #include <Arduino.h>
+#include <array>
 
 
 
 /*<-----    Task handles    ----->*/
 extern TaskHandle_t ledTaskHandle;
 extern TaskHandle_t orientationTaskHandle;
-extern TaskHandle_t distanceLTaskHandle;
+extern TaskHandle_t I2CTaskHandle;
 extern TaskHandle_t sendDataTaskHandle;
 // extern TaskHandle_t reflectTaskHandle;
 
 /*<-----    Task functions  ----->*/
 
 void measureOrientation(void *pvParameter);
-void measureDistanceL(void *pvParameter);
+void measureSensor(void *pvParameter);
 void sendData(void *pvParameter);
 // void measurePhoton(void *pvParameter);
 // void ledIndicate(void *pvParameter);
@@ -25,15 +26,15 @@ void sendData(void *pvParameter);
 struct sysState {
     volatile int16_t distanceL;
     volatile int16_t distanceR;
-    volatile int16_t pitch;
-    volatile int16_t roll;
-    volatile int16_t yaw;
+    volatile float pitch;
+    volatile float roll;
+    volatile float yaw;
+    volatile int16_t travelled;
+    volatile std::array<float, 4> photon;
+    volatile char command;
+    volatile uint8_t status;
     SemaphoreHandle_t mutex;
   };
-  // uint16_t photon0;
-  // uint16_t photon1;
-  // uint16_t photon2;
-  // uint16_t photon3;
 
   extern sysState RoverState;
 
