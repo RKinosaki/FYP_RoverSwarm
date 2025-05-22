@@ -11,7 +11,7 @@ extern TCA9548A I2CMux;
 
 // === GLOBAL VARIABLES === //
 // Task handles
-TaskHandle_t distanceLTaskHandle = nullptr;
+TaskHandle_t I2CTaskHandle = nullptr;
 
 void setupDistL() {
   // Serial.println("Setting up distL!");
