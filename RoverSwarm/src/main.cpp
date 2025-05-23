@@ -8,7 +8,9 @@
 
 #include "freertos/task.h"
 
-//Credientials for mobile hotspot
+#define ARDUINO_USB_CDC_ON_BOOT 1
+
+//Credentials for mobile hotspot
 const char* ssid = "Rees";
 const char* password = "password42";
 
@@ -59,13 +61,15 @@ void setupCommunication(){
 
 void setupI2C(){
   Serial.println("Setting up I2C..");
-  Wire.begin(13, 12);
+  Wire.begin(SDA, SCL);
   I2CMux.begin(Wire);
   I2CMux.closeAll();
 }
 
 void setup() {
+  delay(1000);
   Serial.begin(115200);
+  Serial.print("Hello");
 
   RoverState.mutex = xSemaphoreCreateMutex();
 
@@ -73,7 +77,7 @@ void setup() {
     Serial.println("Failed to create mutex!");
     }
   setupI2C();
-  setupCommunication();
+  // setupCommunication();
   
   
 
@@ -141,7 +145,7 @@ void setup() {
 }
 
 void loop() {
-  // scanI2C(); //Scan I2c for debugging
+  scanI2C(); //Scan I2c for debugging
   Serial.println("Starting Loop...");
   vTaskDelay(pdMS_TO_TICKS(1000));
 }

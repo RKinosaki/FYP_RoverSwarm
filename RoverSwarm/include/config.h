@@ -36,7 +36,8 @@
 #define PHOTON_PRIORITY 3
 
 // I2C Pins
-#define SDA 14
-#define SCL 13
+#define SDA 21
+#define SCL 47
+
 
 #endif
