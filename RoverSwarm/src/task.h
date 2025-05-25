@@ -11,14 +11,16 @@ extern TaskHandle_t ledTaskHandle;
 extern TaskHandle_t orientationTaskHandle;
 extern TaskHandle_t I2CTaskHandle;
 extern TaskHandle_t sendDataTaskHandle;
-// extern TaskHandle_t reflectTaskHandle;
+extern TaskHandle_t reflectTaskHandle;
+extern TaskHandle_t driveTaskHandle;
 
 /*<-----    Task functions  ----->*/
 
 void measureOrientation(void *pvParameter);
 void measureSensor(void *pvParameter);
 void sendData(void *pvParameter);
-// void measurePhoton(void *pvParameter);
+void measurePhoton(void *pvParameter);
+void driveRover(void *pvParameter);
 // void ledIndicate(void *pvParameter);
  
 

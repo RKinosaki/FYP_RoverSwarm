@@ -66,10 +66,32 @@ void setupI2C(){
   I2CMux.closeAll();
 }
 
+void setupPWM(){
+  ledcSetup(0, 1000, 8);
+  ledcSetup(1, 1000, 8);
+
+  ledcAttachPin(ML_P, 0);
+  ledcAttachPin(ML_N, 1);
+}
+
 void setup() {
   delay(1000);
   Serial.begin(115200);
   Serial.print("Hello");
+
+  pinMode(R0, INPUT);
+  pinMode(R1, INPUT);
+  pinMode(R2, INPUT);
+  pinMode(R3, INPUT);
+
+  pinMode(ML_P, OUTPUT);
+  pinMode(ML_N, OUTPUT);
+  pinMode(ML_S, OUTPUT);
+  digitalWrite(ML_S, HIGH);
+  delay(10);
+
+  
+
 
   RoverState.mutex = xSemaphoreCreateMutex();
 
@@ -77,6 +99,7 @@ void setup() {
     Serial.println("Failed to create mutex!");
     }
   setupI2C();
+  setupPWM();
   // setupCommunication();
   
   
@@ -105,6 +128,17 @@ void setup() {
     );
   #endif
 
+  #if DRIVE_ENABLE
+    xTaskCreate(
+      driveRover,         //Function Name
+      "Drive",              //Text Name
+      2500,                       //Stack size (bytes)
+      NULL,                       //Parameters
+      DRIVE_PRIORITY,       // Priority
+      &driveTaskHandle        // Pointer
+    );
+  #endif
+
   #if DISTANCE_ENABLE_L
 
   xTaskCreate(
@@ -130,14 +164,14 @@ void setup() {
   #endif
 
 #if PHOTON_ENABLE
-// xTaskCreate(
-//   measurePhoton,              //Function Name
-//   "PHOTON",                   //Text Name
-//   2500,                       //Stack size (bytes)
-//   NULL,                         //Parameters
-//   PHOTON_PRIORITY,            // Priority
-//   &reflectTaskHandle             // Pointer
-// );
+  xTaskCreate(
+    measurePhoton,              //Function Name
+    "PHOTON",                   //Text Name
+    2500,                       //Stack size (bytes)
+    NULL,                         //Parameters
+    PHOTON_PRIORITY,            // Priority
+    &reflectTaskHandle             // Pointer
+  );
 #endif
 
 
@@ -145,7 +179,7 @@ void setup() {
 }
 
 void loop() {
-  scanI2C(); //Scan I2c for debugging
+  // scanI2C(); //Scan I2c for debugging
   Serial.println("Starting Loop...");
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
