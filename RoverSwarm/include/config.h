@@ -55,5 +55,9 @@
 #define ML_N 7
 #define ML_S 5
 
+#define MR_P 43
+#define MR_N 2
+#define MR_S 44
+
 
 #endif

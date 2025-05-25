@@ -9,10 +9,17 @@ TaskHandle_t driveTaskHandle = nullptr;
 
 
 void driveL(){
-    Serial.println("Drivin'");
+    Serial.println("Driving left");
     ledcWrite(0, 0);
-    ledcWrite(1, 128);
+    ledcWrite(1, 255);
 }
+
+void driveR(){
+    Serial.println("Drivin right");
+    ledcWrite(2, 0);
+    ledcWrite(3, 255);
+}
+
  
 void driveRover(void *pvParameters) {
     (void)pvParameters;
@@ -24,5 +31,6 @@ void driveRover(void *pvParameters) {
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       driveL();
+      driveR();
     }
 }

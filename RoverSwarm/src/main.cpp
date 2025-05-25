@@ -69,9 +69,13 @@ void setupI2C(){
 void setupPWM(){
   ledcSetup(0, 1000, 8);
   ledcSetup(1, 1000, 8);
+  ledcSetup(2, 1000, 8);
+  ledcSetup(3, 1000, 8);
 
   ledcAttachPin(ML_P, 0);
   ledcAttachPin(ML_N, 1);
+  ledcAttachPin(MR_P, 2);
+  ledcAttachPin(MR_N, 3);
 }
 
 void setup() {
@@ -79,15 +83,22 @@ void setup() {
   Serial.begin(115200);
   Serial.print("Hello");
 
+
+  // Reflectance Sensors
   pinMode(R0, INPUT);
   pinMode(R1, INPUT);
   pinMode(R2, INPUT);
   pinMode(R3, INPUT);
 
+  // Motor Pins
   pinMode(ML_P, OUTPUT);
   pinMode(ML_N, OUTPUT);
   pinMode(ML_S, OUTPUT);
+  pinMode(MR_P, OUTPUT);
+  pinMode(MR_N, OUTPUT);
+  pinMode(MR_S, OUTPUT);
   digitalWrite(ML_S, HIGH);
+  digitalWrite(MR_S, HIGH);
   delay(10);
 
   
