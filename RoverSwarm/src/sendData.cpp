@@ -2,6 +2,9 @@
 #include "config.h"
 #include <Arduino.h>
 #include "WiFi.h"
+#include <ArduinoJson.h>
+#include <array>
+
 
 // === GLOBAL VARIABLES === //
 // Task handles
@@ -20,10 +23,10 @@ void sendData(void *pvParameters) {
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+      client.write(RoverState.distanceR);
+      client.write(RoverState.distanceL);
       int16_t localDistanceR = RoverState.distanceR;
       int16_t localDistanceL = RoverState.distanceL;
       xSemaphoreGive(RoverState.mutex);
-      client.write(localDistanceR);
-      client.write(localDistanceL);
     }
 }

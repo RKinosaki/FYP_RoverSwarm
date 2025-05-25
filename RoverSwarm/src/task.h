@@ -28,9 +28,12 @@ void driveRover(void *pvParameter);
 struct sysState {
     volatile int16_t distanceL;
     volatile int16_t distanceR;
-    volatile float pitch;
-    volatile float roll;
-    volatile float yaw;
+    volatile float ax;
+    volatile float ay;
+    volatile float az;
+    volatile float gx;
+    volatile float gy;
+    volatile float gz;
     volatile int16_t travelled;
     volatile std::array<float, 4> photon;
     volatile char command;

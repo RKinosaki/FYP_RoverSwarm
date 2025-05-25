@@ -59,5 +59,10 @@
 #define MR_N 2
 #define MR_S 44
 
+// Channel Pins
+#define Channel_ToF_L 6
+#define Channel_ToF_R 7
+#define Channel_IMU 3
+
 
 #endif
