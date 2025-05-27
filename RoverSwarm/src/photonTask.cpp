@@ -14,7 +14,7 @@ void measurePhoton(void *pvParameters) {
     (void)pvParameters;
 
     /* Make the task execute at a specified frequency */
-    const TickType_t xFrequency = configTICK_RATE_HZ / DISTANCE_FREQ_L;
+    const TickType_t xFrequency = configTICK_RATE_HZ / PHOTON_FREQ;
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for (;;)
     {

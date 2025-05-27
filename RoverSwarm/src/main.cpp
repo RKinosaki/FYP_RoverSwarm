@@ -127,18 +127,6 @@ void setup() {
     // );
   #endif
 
-
-  #if ORIENTATION_ENABLE
-    xTaskCreate(
-      measureOrientation,         //Function Name
-      "Orientation",              //Text Name
-      2500,                       //Stack size (bytes)
-      NULL,                       //Parameters
-      ORIENTATION_PRIORITY,       // Priority
-      &orientationTaskHandle         // Pointer
-    );
-  #endif
-
   #if DRIVE_ENABLE
     xTaskCreate(
       driveRover,         //Function Name
@@ -150,14 +138,14 @@ void setup() {
     );
   #endif
 
-  #if DISTANCE_ENABLE_L
+  #if I2C_ENABLE
 
   xTaskCreate(
     measureSensor,              //Function Name
     "DistanceLeft",                   //Text Name
     5000,                       //Stack size (bytes)
     NULL,                         //Parameters
-    DISTANCE_PRIORITY_L,            // Priority
+    I2C_PRIORITY,            // Priority
     &I2CTaskHandle             // Pointer
   );
   #endif
