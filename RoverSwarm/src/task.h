@@ -21,7 +21,7 @@ void measureSensor(void *pvParameter);
 void sendData(void *pvParameter);
 void measurePhoton(void *pvParameter);
 void driveRover(void *pvParameter);
-// void ledIndicate(void *pvParameter);
+void ledIndicate(void *pvParameter);
  
 
 /*<-----    Shared variables    ----->*/

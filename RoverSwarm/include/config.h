@@ -7,7 +7,7 @@
 #define HARDWARE_TIMER_PRESCALER 80
 
 // LED Task
-#define LED_ENABLE false
+#define LED_ENABLE true
 #define LED_FREQ 1
 #define LED_PRIORITY 5
 
@@ -21,9 +21,9 @@
 #define DATA_FREQ 4
 #define DATA_PRIORITY 2
 
-// DISTANCE task left
+// I2C task left
 #define I2C_ENABLE true
-#define I2C_FREQ 10
+#define I2C_FREQ 50
 #define I2C_PRIORITY 1
 
 // PHOTON task
@@ -32,7 +32,7 @@
 #define PHOTON_PRIORITY 3
 
 //DRIVE task
-#define DRIVE_ENABLE true
+#define DRIVE_ENABLE false
 #define DRIVE_FREQ 20
 #define DRIVE_PRIORITY 5
 
@@ -57,8 +57,12 @@
 
 // Channel Pins
 #define Channel_ToF_L 6
-#define Channel_ToF_R 7
+#define Channel_ToF_R 4
 #define Channel_IMU 3
+
+//LED Pin
+
+#define LED_PIN 8
 
 
 #endif

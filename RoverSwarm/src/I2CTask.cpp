@@ -33,10 +33,9 @@ void setupIMU(){
 
 void setupDistL() {
   // Serial.println("Setting up distL!");
-  I2CMux.openChannel(Channel_ToF_R);
+  I2CMux.openChannel(Channel_ToF_L);
   if (!ToF_L.init()){
     Serial.println("Failed to detect and initalise sensor!");
-    while(1);
   }
   ToF_L.setDistanceMode(VL53L1X::Short);
   ToF_L.setMeasurementTimingBudget(20000);
@@ -45,10 +44,9 @@ void setupDistL() {
 }
 
 void setupDistR() {
-  I2CMux.openChannel(Channel_ToF_L);
+  I2CMux.openChannel(Channel_ToF_R);
   if (!ToF_R.init()){
-    Serial.println("Failed to detect and initalise sensor!");
-    while(1);
+    Serial.println("Right sensor failed to detect and initalise sensor!");
   }
   ToF_R.setDistanceMode(VL53L1X::Short);
   ToF_R.setMeasurementTimingBudget(20000);
@@ -65,7 +63,7 @@ void measureDistR() {
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     RoverState.distanceR = distanceR;
     xSemaphoreGive(RoverState.mutex);
-    I2CMux.closeChannel(Channel_ToF_L);
+    I2CMux.closeChannel(Channel_ToF_R);
 }
 
 void measureDistL() {
@@ -77,7 +75,7 @@ void measureDistL() {
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     RoverState.distanceL = distanceL;
     xSemaphoreGive(RoverState.mutex);
-    I2CMux.closeChannel(Channel_ToF_R);
+    I2CMux.closeChannel(Channel_ToF_L);
 }
 
 void measureIMU(){
@@ -110,14 +108,14 @@ void measureSensor(void *pvParameters) {
     for (;;)
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      setupDistL(); //sets up the parameter for ToF Sensor'
-      if(RoverState.mutex==NULL){
-        Serial.println("No Mutex");
-      }
-      Serial.println();
-      Serial.print("Left: ");
-      Serial.print(RoverState.distanceL);
-      Serial.println();
+      // setupDistL(); //sets up the parameter for ToF Sensor'
+      // if(RoverState.mutex==NULL){
+      //   Serial.println("No Mutex");
+      // }
+      // Serial.println();
+      // Serial.print("Left: ");
+      // Serial.print(RoverState.distanceL);
+      // Serial.println();
 
       setupDistR(); //sets up the parameter for ToF Sensor
       if(RoverState.mutex==NULL){
@@ -136,6 +134,12 @@ void measureSensor(void *pvParameters) {
       }
       else{
       measureIMU();
+      Serial.print(RoverState.ax);
+      Serial.print(RoverState.ay);
+      Serial.print(RoverState.az);
+      Serial.print(RoverState.gx);
+      Serial.print(RoverState.gy);
+      Serial.print(RoverState.gz);
       }
     }
 }

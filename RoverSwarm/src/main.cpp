@@ -90,6 +90,9 @@ void setup() {
   pinMode(R2, INPUT);
   pinMode(R3, INPUT);
 
+  //LED Pins;
+  pinMode(LED_PIN, OUTPUT);
+
   // Motor Pins
   pinMode(ML_P, OUTPUT);
   pinMode(ML_N, OUTPUT);
@@ -117,14 +120,14 @@ void setup() {
 
   //Create Tasks//
   #if LED_ENABLE
-    // xTaskCreate(
-    //   ledIndicate,        //Function Name
-    //   "LED",              //Text Name
-    //   2500,               //Stack size (bytes)
-    //   NULL,               //Parameters
-    //   LED_PRIORITY,       // Priority
-    //   &ledTaskHandle        // Pointer
-    // );
+    xTaskCreate(
+      ledIndicate,        //Function Name
+      "LED",              //Text Name
+      2500,               //Stack size (bytes)
+      NULL,               //Parameters
+      LED_PRIORITY,       // Priority
+      &ledTaskHandle        // Pointer
+    );
   #endif
 
   #if DRIVE_ENABLE
