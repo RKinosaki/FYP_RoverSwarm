@@ -108,14 +108,15 @@ void measureSensor(void *pvParameters) {
     for (;;)
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      // setupDistL(); //sets up the parameter for ToF Sensor'
-      // if(RoverState.mutex==NULL){
-      //   Serial.println("No Mutex");
-      // }
-      // Serial.println();
-      // Serial.print("Left: ");
-      // Serial.print(RoverState.distanceL);
-      // Serial.println();
+      setupDistL(); //sets up the parameter for ToF Sensor'
+      if(RoverState.mutex==NULL){
+        Serial.println("No Mutex");
+      }
+      measureDistL();
+      Serial.println();
+      Serial.print("Left: ");
+      Serial.print(RoverState.distanceL);
+      Serial.println();
 
       setupDistR(); //sets up the parameter for ToF Sensor
       if(RoverState.mutex==NULL){
