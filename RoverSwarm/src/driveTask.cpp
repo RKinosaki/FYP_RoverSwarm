@@ -5,17 +5,42 @@
 // === GLOBAL VARIABLES === //
 // Task handles
 TaskHandle_t driveTaskHandle = nullptr;
+volatile int encoderCountL = 0;
+volatile int encoderCountR = 0;
+int prevCountR = 0;
+int prevCountL = 0;
 
+// === INTERRUPT === //
+
+void IRAM_ATTR sampleEncoderISRL(){
+    bool B = digitalRead(EL_B);
+        if(B){
+            encoderCountL--;
+        }
+        else{
+            encoderCountL++;
+        }
+    }
+
+    void IRAM_ATTR sampleEncoderISRR(){
+    bool B = digitalRead(ER_B);
+        if(B){
+            encoderCountR--;
+        }
+        else{
+            encoderCountR++;
+        }
+    }
 
 
 void driveL(){
-    Serial.println("Driving left");
+    // Serial.println("Driving left");
     ledcWrite(0, 0);
     ledcWrite(1, 255);
 }
 
 void driveR(){
-    Serial.println("Drivin right");
+    // Serial.println("Drivin right");
     ledcWrite(2, 0);
     ledcWrite(3, 255);
 }
@@ -32,5 +57,18 @@ void driveRover(void *pvParameters) {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       driveL();
       driveR();
+      int encoderCountCopyR = encoderCountR;
+      int encoderCountCopyL = encoderCountL;
+      if(encoderCountCopyR != prevCountR){
+        Serial.println("Right Encoder count is: ");
+        Serial.println(encoderCountCopyR);
+        prevCountR = encoderCountCopyR;
+      }
+      if (encoderCountCopyL != prevCountL){
+        Serial.println("Left Encoder count is: ");
+        Serial.println(encoderCountCopyL);
+        prevCountL = encoderCountCopyL;
+      }
     }
+    
 }

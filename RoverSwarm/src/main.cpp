@@ -20,6 +20,10 @@ TCA9548A I2CMux;
 
 sysState RoverState;
 
+// Hardware timer
+
+hw_timer_t *encoderTimer = NULL;
+
 void scanI2C() {
   Serial.println("Scanning I2C bus...");
   uint8_t count = 0;
@@ -102,7 +106,11 @@ void setup() {
   pinMode(MR_S, OUTPUT);
   digitalWrite(ML_S, HIGH);
   digitalWrite(MR_S, HIGH);
-  delay(10);
+  
+  pinMode(EL_A, INPUT);
+  pinMode(EL_B, INPUT);
+  pinMode(ER_A, INPUT);
+  pinMode(ER_B, INPUT);
 
   
 
@@ -134,11 +142,19 @@ void setup() {
     xTaskCreate(
       driveRover,         //Function Name
       "Drive",              //Text Name
-      2500,                       //Stack size (bytes)
+      8192,                       //Stack size (bytes)
       NULL,                       //Parameters
       DRIVE_PRIORITY,       // Priority
       &driveTaskHandle        // Pointer
     );
+
+
+    attachInterrupt(digitalPinToInterrupt(ER_A), sampleEncoderISRR, RISING);
+    attachInterrupt(digitalPinToInterrupt(EL_A), sampleEncoderISRL, RISING);
+    // encoderTimer = timerBegin(0, HARDWARE_TIMER_PRESCALER, true);
+    // timerAttachInterrupt(encoderTimer, sampleEncoderISR, true);
+    // timerAlarmWrite(encoderTimer, (APB_CLK_FREQ/HARDWARE_TIMER_PRESCALER)/DRIVE_FREQ, true);
+    // timerAlarmEnable(encoderTimer);
   #endif
 
   #if I2C_ENABLE

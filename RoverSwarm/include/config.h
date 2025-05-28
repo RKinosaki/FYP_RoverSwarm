@@ -22,7 +22,7 @@
 #define DATA_PRIORITY 2
 
 // I2C task left
-#define I2C_ENABLE true
+#define I2C_ENABLE false
 #define I2C_FREQ 50
 #define I2C_PRIORITY 1
 
@@ -32,7 +32,7 @@
 #define PHOTON_PRIORITY 3
 
 //DRIVE task
-#define DRIVE_ENABLE false
+#define DRIVE_ENABLE true
 #define DRIVE_FREQ 20
 #define DRIVE_PRIORITY 5
 
@@ -55,6 +55,12 @@
 #define MR_N 2
 #define MR_S 44
 
+// Encoder Pins
+#define EL_A 16
+#define EL_B 17
+#define ER_A 38
+#define ER_B 39
+
 // Channel Pins
 #define Channel_ToF_L 4
 #define Channel_ToF_R 7
@@ -63,6 +69,5 @@
 //LED Pin
 
 #define LED_PIN 8
-
 
 #endif

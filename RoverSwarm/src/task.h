@@ -44,3 +44,6 @@ struct sysState {
   extern sysState RoverState;
 
 #endif
+
+void IRAM_ATTR sampleEncoderISRR();
+void IRAM_ATTR sampleEncoderISRL();
