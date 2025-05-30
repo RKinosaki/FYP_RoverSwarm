@@ -11,8 +11,8 @@
 #define ARDUINO_USB_CDC_ON_BOOT 1
 
 //Credentials for mobile hotspot
-const char* ssid = "Rees";
-const char* password = "password42";
+const char* ssid = "bobcat-dev";
+const char* password = "bobcat2025";
 
 //Constructor declarations
 WiFiClient client;
@@ -54,9 +54,8 @@ void setupCommunication(){
 
   Serial.println("\nConnected to network!:");
   Serial.println(WiFi.localIP());
-  WiFi.setTxPower(WIFI_POWER_7dBm);
 
-  while(!client.connect(IPAddress(192,168,75,151), 10000)){
+  while(!client.connect(IPAddress(192,168,136,232), 50)){
     Serial.println("Connection to host failed");
     delay(1000);
   }
@@ -120,6 +119,8 @@ void setup() {
   if(RoverState.mutex == NULL){
     Serial.println("Failed to create mutex!");
     }
+
+  setupCommunication();
   setupI2C();
   setupPWM();
   // setupCommunication();

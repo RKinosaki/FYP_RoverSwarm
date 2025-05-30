@@ -34,7 +34,7 @@ struct sysState {
     volatile float gx;
     volatile float gy;
     volatile float gz;
-    volatile int16_t travelled;
+    volatile float travelled;
     volatile std::array<float, 4> photon;
     volatile char command;
     volatile uint8_t status;

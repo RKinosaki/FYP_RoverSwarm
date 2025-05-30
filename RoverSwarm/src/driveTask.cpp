@@ -57,17 +57,18 @@ void driveRover(void *pvParameters) {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       driveL();
       driveR();
-      int encoderCountCopyR = encoderCountR;
-      int encoderCountCopyL = encoderCountL;
-      if(encoderCountCopyR != prevCountR){
+      int distanceR = ENCODER_RES*encoderCountR/(2*3.1415);
+      int distanceL = ENCODER_RES*encoderCountL/(2*3.1415);
+      if(distanceR != prevCountR){
         Serial.println("Right Encoder count is: ");
-        Serial.println(encoderCountCopyR);
-        prevCountR = encoderCountCopyR;
+        Serial.println(distanceR);
+        prevCountR = distanceR;
+        RoverState.travelled = distanceR;
       }
-      if (encoderCountCopyL != prevCountL){
+      if (distanceL != prevCountL){
         Serial.println("Left Encoder count is: ");
-        Serial.println(encoderCountCopyL);
-        prevCountL = encoderCountCopyL;
+        Serial.println(distanceL);
+        prevCountL = distanceL;
       }
     }
     

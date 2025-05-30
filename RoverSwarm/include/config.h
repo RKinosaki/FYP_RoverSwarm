@@ -70,4 +70,8 @@
 
 #define LED_PIN 8
 
+
+//Tyre Parameters
+#define TYRE_DIAMETER 34
+#define ENCODER_RES 350
 #endif
