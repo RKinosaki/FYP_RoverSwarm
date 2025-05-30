@@ -6,11 +6,12 @@
 #include "TCA9548A.h"
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+#include <MPU6050_light.h>
+
 
 
 VL53L1X ToF_L, ToF_R;
 extern TCA9548A I2CMux;
-
 Adafruit_MPU6050 imu;  //Initialise Object
 
 // === GLOBAL VARIABLES === //
@@ -23,12 +24,9 @@ void setupIMU(){
       Serial.println("Failed to initialize MPU6050");
       while (1) {
       }
+      
   }
   Serial.println("MPU6050 Found");
-  imu.setAccelerometerRange(ORIENTATION_ACCEL_RANGE);
-  imu.setGyroRange(ORIENTATION_GYRO_RANGE);
-  imu.setFilterBandwidth(ORIENTATION_BANDWIDTH);
-  
 }
 
 void setupDistL() {
@@ -79,21 +77,21 @@ void measureDistL() {
 }
 
 void measureIMU(){
-    sensors_event_t a, g, temp;
-  
+  sensors_event_t a, g, temp;
+  float dt = 1/I2C_FREQ;
   // Attempt to get sensor readings.
   bool readSuccess = imu.getEvent(&a, &g, &temp);
   if (!readSuccess) {
     Serial.println("Failed to get sensor event");
   } else {
-  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-  RoverState.ax = a.acceleration.x;
-  RoverState.ay = a.acceleration.y;
-  RoverState.az = a.acceleration.z;
-  RoverState.gx = g.gyro.x;
-  RoverState.gy = g.gyro.y;
-  RoverState.gz = g.gyro.z;
-  xSemaphoreGive(RoverState.mutex);
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    float localRoverYaw = RoverState.az;
+    xSemaphoreGive(RoverState.mutex);
+    localRoverYaw+=g.gyro.z/131*dt;
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.az = localRoverYaw;
+    xSemaphoreGive(RoverState.mutex);
+    Serial.println(g.gyro.z);
   }
   I2CMux.closeChannel(Channel_IMU);
 }
@@ -113,10 +111,10 @@ void measureSensor(void *pvParameters) {
         Serial.println("No Mutex");
       }
       measureDistL();
-      Serial.println();
-      Serial.print("Left: ");
-      Serial.print(RoverState.distanceL);
-      Serial.println();
+      // Serial.println();
+      // Serial.print("Left: ");
+      // Serial.print(RoverState.distanceL);
+      // Serial.println();
 
       setupDistR(); //sets up the parameter for ToF Sensor
       if(RoverState.mutex==NULL){
@@ -124,10 +122,10 @@ void measureSensor(void *pvParameters) {
       }
       else{
       measureDistR();
-      Serial.println();
-      Serial.print("Right: ");
-      Serial.print(RoverState.distanceR);
-      Serial.println();
+      // Serial.println();
+      // Serial.print("Right: ");
+      // Serial.print(RoverState.distanceR);
+      // Serial.println();
       }
       setupIMU(); //sets up the parameter for IMU
       if(RoverState.mutex==NULL){
@@ -135,12 +133,12 @@ void measureSensor(void *pvParameters) {
       }
       else{
       measureIMU();
-      Serial.print(RoverState.ax);
-      Serial.print(RoverState.ay);
-      Serial.print(RoverState.az);
-      Serial.print(RoverState.gx);
-      Serial.print(RoverState.gy);
-      Serial.print(RoverState.gz);
+      // Serial.println(RoverState.ax);
+      // Serial.println(RoverState.ay);
+      // Serial.println(RoverState.az);
+      // Serial.println(RoverState.gx);
+      // Serial.println(RoverState.gy);
+      // Serial.println(RoverState.gz);
       }
     }
 }

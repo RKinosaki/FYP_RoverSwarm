@@ -41,8 +41,8 @@ void driveL(){
 
 void driveR(){
     // Serial.println("Drivin right");
-    ledcWrite(2, 0);
-    ledcWrite(3, 255);
+    ledcWrite(2, 255);
+    ledcWrite(3, 0);
 }
 
  

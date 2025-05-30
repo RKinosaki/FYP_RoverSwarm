@@ -28,12 +28,12 @@ void ledIndicate(void *pvParameter);
 struct sysState {
     volatile int16_t distanceL = 0;
     volatile int16_t distanceR = 0;
-    volatile float ax = 0;
-    volatile float ay = 0;
-    volatile float az = 0;
-    volatile float gx = 0;
-    volatile float gy = 0;
-    volatile float gz = 0;
+    volatile float ax;
+    volatile float ay;
+    volatile float az;
+    volatile float gx;
+    volatile float gy;
+    volatile float gz ;
     volatile float travelled = 0;
     volatile float photon0 = 0;
     volatile float photon1 = 0;

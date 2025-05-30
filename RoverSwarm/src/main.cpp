@@ -120,10 +120,11 @@ void setup() {
     Serial.println("Failed to create mutex!");
     }
 
-  setupCommunication();
+  if(SEND_DATA){
+    setupCommunication();
+  }
   setupI2C();
   setupPWM();
-  // setupCommunication();
   
   
 
