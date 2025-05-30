@@ -17,12 +17,12 @@
 #define ORIENTATION_BANDWIDTH MPU6050_BAND_21_HZ
 
 //SendData Task
-#define SEND_DATA false
-#define DATA_FREQ 4
+#define SEND_DATA true
+#define DATA_FREQ 1
 #define DATA_PRIORITY 2
 
 // I2C task left
-#define I2C_ENABLE false
+#define I2C_ENABLE true
 #define I2C_FREQ 50
 #define I2C_PRIORITY 1
 

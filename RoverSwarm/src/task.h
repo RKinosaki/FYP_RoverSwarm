@@ -26,18 +26,21 @@ void ledIndicate(void *pvParameter);
 
 /*<-----    Shared variables    ----->*/
 struct sysState {
-    volatile int16_t distanceL;
-    volatile int16_t distanceR;
-    volatile float ax;
-    volatile float ay;
-    volatile float az;
-    volatile float gx;
-    volatile float gy;
-    volatile float gz;
-    volatile float travelled;
-    volatile std::array<float, 4> photon;
-    volatile char command;
-    volatile uint8_t status;
+    volatile int16_t distanceL = 0;
+    volatile int16_t distanceR = 0;
+    volatile float ax = 0;
+    volatile float ay = 0;
+    volatile float az = 0;
+    volatile float gx = 0;
+    volatile float gy = 0;
+    volatile float gz = 0;
+    volatile float travelled = 0;
+    volatile float photon0 = 0;
+    volatile float photon1 = 0;
+    volatile float photon2 = 0;
+    volatile float photon3 = 0;
+    volatile char command = 'f';
+    volatile uint8_t status = 0;
     SemaphoreHandle_t mutex;
   };
 

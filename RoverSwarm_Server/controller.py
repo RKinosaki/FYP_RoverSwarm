@@ -1,4 +1,6 @@
 import socket
+import json
+import asyncio
 
 ##create tcp socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,14 +15,14 @@ while True:
     connection, client_address = sock.accept()
     print('connection from', client_address)  
     try:  
-        while True:
-                ##wasd bind is used for movement command that is sent to the rover
-                data = connection.recv(1024)
+        with connection.makefile('r') as f:
+            for line in f:
                 try:
-                    print(data)
-                    print(int(data.hex(), 16))
-                except ValueError as e:
-                     print(e)
+                    line = line.strip()
+                    data = json.loads(line)
+                    print("Parsed JSON:", data)
+                except json.JSONDecodeError as e:
+                    print("JSON Decode Error:", e)
     finally:
         connection.close()        
 
