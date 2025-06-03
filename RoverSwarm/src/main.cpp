@@ -22,7 +22,8 @@ sysState RoverState;
 
 // Hardware timer
 
-hw_timer_t *encoderTimer = NULL;
+hw_timer_t *controllerTimer = NULL;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 void scanI2C() {
   Serial.println("Scanning I2C bus...");
@@ -95,6 +96,7 @@ void setup() {
 
   //LED Pins;
   pinMode(LED_PIN, OUTPUT);
+  pinMode(LED_PIN, HIGH);
 
   // Motor Pins
   pinMode(ML_P, OUTPUT);
@@ -112,7 +114,11 @@ void setup() {
   pinMode(ER_B, INPUT);
 
   
-
+  //setup timer
+  controllerTimer = timerBegin(0, 80, true);
+  timerAttachInterrupt(controllerTimer, &controlMotorISR, true);
+  timerAlarmWrite(controllerTimer, 50000, true);
+  timerAlarmEnable(controllerTimer);
 
   RoverState.mutex = xSemaphoreCreateMutex();
 
@@ -121,7 +127,9 @@ void setup() {
     }
 
   if(SEND_DATA){
+    RoverState.status = 1;
     setupCommunication();
+    RoverState. status = 0;
   }
   setupI2C();
   setupPWM();

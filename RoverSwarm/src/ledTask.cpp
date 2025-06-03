@@ -6,25 +6,53 @@
 // Task handles
 TaskHandle_t ledTaskHandle = nullptr;
 
-void sendLight(bool on){
-    if (on){
-        digitalWrite(LED_PIN, HIGH);
+bool flashFlag = false;
+int count = 0;
+
+void checkstatus(){
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    int status = RoverState.status;
+    xSemaphoreGive(RoverState.mutex);
+    if(status==0){
+        flashFlag = false;
     }
-    else{
-        digitalWrite(LED_PIN, LOW);
+    else if(status == 1){ //Connecting to TCP Socket
+        if(count < 20){
+            flashFlag = true;
+        }
+        else{
+            flashFlag = false;
+        }
     }
-    
+    else if (status == 2){ //One of the sensors is not connected
+        if(count < 10){
+            flashFlag = true;
+        }
+        else{
+            flashFlag = false;
+        }
+    }
 }
+
+
+
  
 void ledIndicate(void *pvParameters) {
     (void)pvParameters;
 
     /* Make the task execute at a specified frequency */
-    const TickType_t xFrequency = configTICK_RATE_HZ / LED_FREQ;
-    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xDelay = pdMS_TO_TICKS(100);
     for (;;)
     {
-      vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      sendLight(true);
+        vTaskDelay(xDelay);
+        checkstatus();
+        if(flashFlag){
+            count+=1;
+            pinMode(LED_PIN, HIGH);
+        }
+        else{
+            count = 0;
+            pinMode(LED_PIN, LOW);
+        }
     }
 }

@@ -22,11 +22,14 @@ void setupIMU(){
   I2CMux.openChannel(Channel_IMU);
   if (!imu.begin()){     //Initialise IMU
       Serial.println("Failed to initialize MPU6050");
-      while (1) {
-      }
-      
+      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+      RoverState.status=2;
+      xSemaphoreGive(RoverState.mutex);
   }
-  Serial.println("MPU6050 Found");
+  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+  RoverState.status = 0;
+  xSemaphoreGive(RoverState.mutex);
+  // Serial.println("MPU6050 Found");
 }
 
 void setupDistL() {
@@ -34,7 +37,13 @@ void setupDistL() {
   I2CMux.openChannel(Channel_ToF_L);
   if (!ToF_L.init()){
     Serial.println("Failed to detect and initalise sensor!");
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.status=2;
+    xSemaphoreGive(RoverState.mutex);
   }
+  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+  RoverState.status = 0;
+  xSemaphoreGive(RoverState.mutex);
   ToF_L.setDistanceMode(VL53L1X::Short);
   ToF_L.setMeasurementTimingBudget(20000);
   ToF_L.startContinuous(20);
@@ -45,7 +54,13 @@ void setupDistR() {
   I2CMux.openChannel(Channel_ToF_R);
   if (!ToF_R.init()){
     Serial.println("Right sensor failed to detect and initalise sensor!");
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.status=2;
+    xSemaphoreGive(RoverState.mutex);
   }
+  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+  RoverState.status = 0;
+  xSemaphoreGive(RoverState.mutex);
   ToF_R.setDistanceMode(VL53L1X::Short);
   ToF_R.setMeasurementTimingBudget(20000);
   ToF_R.startContinuous(20);
@@ -91,7 +106,7 @@ void measureIMU(){
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     RoverState.az = localRoverYaw;
     xSemaphoreGive(RoverState.mutex);
-    Serial.println(g.gyro.z);
+    // Serial.println(g.gyro.z);
   }
   I2CMux.closeChannel(Channel_IMU);
 }

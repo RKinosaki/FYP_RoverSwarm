@@ -48,5 +48,8 @@ struct sysState {
 
 #endif
 
+void IRAM_ATTR controlMotorISR();
 void IRAM_ATTR sampleEncoderISRR();
 void IRAM_ATTR sampleEncoderISRL();
+
+extern portMUX_TYPE timerMux;

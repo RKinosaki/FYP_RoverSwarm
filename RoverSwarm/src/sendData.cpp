@@ -44,10 +44,9 @@ void sendData(void *pvParameters) {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
       updatePackage();
-      serializeJson(package, Serial);
+      // serializeJson(package, Serial);
       serializeJson(package, client);
       client.write('\n');
-      delayMicroseconds(100);
       xSemaphoreGive(RoverState.mutex);
     }
 }
