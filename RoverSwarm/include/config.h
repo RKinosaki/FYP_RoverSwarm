@@ -22,7 +22,7 @@
 #define DATA_PRIORITY 2
 
 // I2C task left
-#define I2C_ENABLE true
+#define I2C_ENABLE false
 #define I2C_FREQ 50
 #define I2C_PRIORITY 1
 
@@ -73,5 +73,14 @@
 
 //Tyre Parameters
 #define TYRE_DIAMETER 34
-#define ENCODER_RES 350
+#define ENCODER_RES 700
+#define PI 3.1415
+
+//WIFI creds
+#define PORT 50
+#define IP1 192
+#define IP2 168
+#define IP3 136
+#define IP4 232
+
 #endif

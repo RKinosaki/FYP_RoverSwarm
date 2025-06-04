@@ -51,16 +51,19 @@ void setupCommunication(){
   while(WiFi.status() != WL_CONNECTED){
     Serial.print(".");
     delay(100);
+    RoverState.status=1;
   }
 
   Serial.println("\nConnected to network!:");
   Serial.println(WiFi.localIP());
 
-  while(!client.connect(IPAddress(192,168,136,232), 50)){
+  while(!client.connect(IPAddress(IP1, IP2, IP3, IP4), PORT)){
     Serial.println("Connection to host failed");
+    RoverState.status=1;
     delay(1000);
   }
   Serial.println("Connected to server!");
+  RoverState.status=0;
 }
 
 void setupI2C(){

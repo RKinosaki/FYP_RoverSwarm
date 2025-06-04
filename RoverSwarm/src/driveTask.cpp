@@ -76,8 +76,8 @@ void driveRover(void *pvParameters) {
       if(controlFlag_){
         drive();
       }
-      int distanceR = ENCODER_RES*encoderCountR/(2*3.1415);
-      int distanceL = ENCODER_RES*encoderCountL/(2*3.1415);
+      float distanceR = (PI*TYRE_DIAMETER*encoderCountR)/(ENCODER_RES);
+      float distanceL = (PI*TYRE_DIAMETER*encoderCountL/(ENCODER_RES));
       if(distanceR != prevCountR){
         Serial.println("Right Encoder count is: ");
         Serial.println(distanceR);

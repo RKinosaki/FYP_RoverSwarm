@@ -21,12 +21,13 @@ y_end = 700
 x = [0]
 y= [0]
 
-def findObstaclePosition(obst, travelled):
+def findObstaclePosition(obst, travelled, yaw):
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
     ##TODO: Implement addition of IMU yaw
-    obstL = [travelled - obst[0]/math.sqrt(2),  travelled + obst[0]/math.sqrt(2)]
-    obstR = [travelled + obst[1]/math.sqrt(2), travelled + obst[1]/math.sqrt(2)]
-    return [0.1*obstL, 0.1*obstR]
+    ## L = 0.1*distance (in cm)*cos(45+yaw), 0.1*distance*sin(45+yaw)
+    obstL = [(travelled - 0.1*obst[0]*math.cos((math.pi/4)+yaw[0])),(travelled +  0.1*obst[0]*math.sin((math.pi/4+yaw[0])))] 
+    obstR = [(travelled - 0.1*obst[1]*math.cos((math.pi/4)+yaw[0])),(travelled +  0.1*obst[1]*math.sin((math.pi/4+yaw[0])))]
+    return [obstL, obstR]
 
 
 def updatePlots(frame):
@@ -46,7 +47,7 @@ def receive_data():
                         line = line.strip()
                         data = json.loads(line)
                         print("Parsed JSON:", data)
-                        distance = findObstaclePosition(data["distance"], data["travelled"])
+                        distance = findObstaclePosition(data["distance"], data["travelled"], data["IMU"]["a"])
                         print("Obstacle position: ", distance[0], ", ", distance[1])
                         x.extend([distance[0][0], distance[1][0]])
                         y.extend([distance[0][1], distance[1][1]])
