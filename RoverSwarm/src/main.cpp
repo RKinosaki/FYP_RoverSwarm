@@ -100,7 +100,6 @@ void setup() {
   //LED Pins;
   pinMode(LED_PIN, OUTPUT);
   pinMode(LED_PIN, HIGH);
-
   // Motor Pins
   pinMode(ML_P, OUTPUT);
   pinMode(ML_N, OUTPUT);

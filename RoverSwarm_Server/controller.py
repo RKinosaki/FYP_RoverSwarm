@@ -18,24 +18,35 @@ x_end = 700
 y_end = 700
 
 ## Initialised position
-x = [0]
-y= [0]
+obstx = [0, 0] #In the order of L R
+obsty = [0, 0]
+posx = [0]
+posy = [0]
 
-def findObstaclePosition(obst, travelled, yaw):
+def findObstaclePosition(obst, yaw):
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
-    ##TODO: Implement addition of IMU yaw
     ## L = 0.1*distance (in cm)*cos(45+yaw), 0.1*distance*sin(45+yaw)
-    obstL = [(travelled - 0.1*obst[0]*math.cos((math.pi/4)+yaw[0])),(travelled +  0.1*obst[0]*math.sin((math.pi/4+yaw[0])))] 
-    obstR = [(travelled - 0.1*obst[1]*math.cos((math.pi/4)+yaw[0])),(travelled +  0.1*obst[1]*math.sin((math.pi/4+yaw[0])))]
-    return [obstL, obstR]
+    obstx.append(posx[-1]+0.1*obst[0]*math.cos((3*math.pi/4)+yaw))
+    obsty.append(posy[-2]+0.1*obst[0]*math.sin((3*math.pi/4+yaw)))
+    obstx.append(posx[-1]+0.1*obst[0]*math.cos((math.pi/4)+yaw))
+    obsty.append(posy[-2]+0.1*obst[0]*math.sin((math.pi/4+yaw)))
+
+def findPosition(segment, yaw):
+    posx.append(posx[-1]+segment*math.sin(yaw))
+    posy.append(posy[-1]+segment*math.cos(yaw))
+
 
 
 def updatePlots(frame):
     global graph
-    graph.set_offsets(list(zip(x,y)))
+    global posgraph
+    graph.set_offsets(list(zip(obstx,obsty)))
+    posgraph.set_offsets(list(zip(posx, posy)))
 
 
 def receive_data():
+    prevTravelled = 0
+
     while True:
         print('waiting for connection')
         connection, client_address = sock.accept()
@@ -47,10 +58,11 @@ def receive_data():
                         line = line.strip()
                         data = json.loads(line)
                         print("Parsed JSON:", data)
-                        distance = findObstaclePosition(data["distance"], data["travelled"], data["IMU"]["a"])
-                        print("Obstacle position: ", distance[0], ", ", distance[1])
-                        x.extend([distance[0][0], distance[1][0]])
-                        y.extend([distance[0][1], distance[1][1]])
+                        yaw = data["yaw"]
+                        segment = data["travelled"]-prevTravelled
+                        prevTravelled = data["travelled"]
+                        findPosition(segment, yaw)
+                        findObstaclePosition(data["distance"], yaw)
                         updatePlots(frame=None)
                     except json.JSONDecodeError as e:
                         print("JSON Decode Error:", e)
@@ -63,7 +75,8 @@ thread.start()
 fig, ax = plt.subplots()
 plt.xlim(-x_end, x_end)
 plt.ylim(-y_end, y_end)
-graph = ax.scatter(x, y)
+graph = ax.scatter(obstx, obsty, marker='.', s=1, c='blue')
+posgraph = ax.scatter(posx, posy, marker='.', s=1, c='red')
 anim = FuncAnimation(fig, updatePlots, frames=None)
 plt.show()    
 

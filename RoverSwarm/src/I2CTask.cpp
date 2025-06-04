@@ -29,7 +29,7 @@ void setupIMU(){
   xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
   RoverState.status = 0;
   xSemaphoreGive(RoverState.mutex);
-  // Serial.println("MPU6050 Found");
+  Serial.println("MPU6050 Found");
 }
 
 void setupDistL() {
@@ -93,20 +93,22 @@ void measureDistL() {
 
 void measureIMU(){
   sensors_event_t a, g, temp;
-  float dt = 1/I2C_FREQ;
+  float dt = 0.02;
   // Attempt to get sensor readings.
   bool readSuccess = imu.getEvent(&a, &g, &temp);
   if (!readSuccess) {
     Serial.println("Failed to get sensor event");
   } else {
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-    float localRoverYaw = RoverState.az;
+    float localRoverYaw = RoverState.yaw;
     xSemaphoreGive(RoverState.mutex);
-    localRoverYaw+=g.gyro.z/131*dt;
+    localRoverYaw+=g.gyro.z*dt;  
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-    RoverState.az = localRoverYaw;
+    RoverState.yaw = localRoverYaw;
     xSemaphoreGive(RoverState.mutex);
+    // Serial.println(localRoverYaw);
     // Serial.println(g.gyro.z);
+    // Serial.println(dt);
   }
   I2CMux.closeChannel(Channel_IMU);
 }
@@ -121,39 +123,44 @@ void measureSensor(void *pvParameters) {
     for (;;)
     {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
-      setupDistL(); //sets up the parameter for ToF Sensor'
-      if(RoverState.mutex==NULL){
-        Serial.println("No Mutex");
+      if(EN_TOF_L){
+        setupDistL(); //sets up the parameter for ToF Sensor'
+        if(RoverState.mutex==NULL){
+          Serial.println("No Mutex");
+        }
+        measureDistL();
+        // Serial.println();
+        // Serial.print("Left: ");
+        // Serial.print(RoverState.distanceL);
+        // Serial.println();
       }
-      measureDistL();
-      // Serial.println();
-      // Serial.print("Left: ");
-      // Serial.print(RoverState.distanceL);
-      // Serial.println();
-
-      setupDistR(); //sets up the parameter for ToF Sensor
-      if(RoverState.mutex==NULL){
-        Serial.println("No Mutex");
+      if(EN_TOF_R){
+        setupDistR(); //sets up the parameter for ToF Sensor
+        if(RoverState.mutex==NULL){
+          Serial.println("No Mutex");
+        }
+        else{
+        measureDistR();
+        // Serial.println();
+        // Serial.print("Right: ");
+        Serial.print(RoverState.distanceR);
+        // Serial.println();
+        }
       }
-      else{
-      measureDistR();
-      // Serial.println();
-      // Serial.print("Right: ");
-      // Serial.print(RoverState.distanceR);
-      // Serial.println();
-      }
-      setupIMU(); //sets up the parameter for IMU
-      if(RoverState.mutex==NULL){
-        Serial.println("No Mutex");
-      }
-      else{
-      measureIMU();
-      // Serial.println(RoverState.ax);
-      // Serial.println(RoverState.ay);
-      // Serial.println(RoverState.az);
-      // Serial.println(RoverState.gx);
-      // Serial.println(RoverState.gy);
-      // Serial.println(RoverState.gz);
+        if(EN_IMU){
+        setupIMU(); //sets up the parameter for IMU
+        if(RoverState.mutex==NULL){
+          Serial.println("No Mutex");
+        }
+        else{
+        measureIMU();
+        // Serial.println(RoverState.ax);
+        // Serial.println(RoverState.ay);
+        // Serial.println(RoverState.az);
+        // Serial.println(RoverState.gx);
+        // Serial.println(RoverState.gy);
+        // Serial.println(RoverState.gz);
+        }
       }
     }
 }

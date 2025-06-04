@@ -17,12 +17,7 @@ JsonDocument package;
 void updatePackage(){
   package["distance"][0] = RoverState.distanceL;
   package["distance"][1] = RoverState.distanceR;
-  package["IMU"]["a"][0] = RoverState.ax; 
-  package["IMU"]["a"][1] = RoverState.ay; 
-  package["IMU"]["a"][2] = RoverState.az; 
-  package["IMU"]["g"][0] = RoverState.gx; 
-  package["IMU"]["g"][1] = RoverState.gy; 
-  package["IMU"]["g"][2] = RoverState.gz; 
+  package["yaw"] = RoverState.yaw;
   package["Photon"][0] = RoverState.photon0;
   package["Photon"][1] = RoverState.photon1;
   package["Photon"][2] = RoverState.photon2;
