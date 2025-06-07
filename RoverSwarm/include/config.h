@@ -19,13 +19,13 @@
 //SendData Task
 #define SEND_DATA true
 #define DATA_FREQ 4
-#define DATA_PRIORITY 2
+#define DATA_PRIORITY 3
 
 // I2C task
 #define I2C_ENABLE true
-#define I2C_FREQ 50
+#define I2C_FREQ 100
 #define I2C_PRIORITY 1
-#define EN_TOF_R false
+#define EN_TOF_R true
 #define EN_TOF_L true
 #define EN_IMU true
 
@@ -36,8 +36,8 @@
 
 //DRIVE task
 #define DRIVE_ENABLE true
-#define DRIVE_FREQ 10
-#define DRIVE_PRIORITY 5
+#define DRIVE_FREQ 200
+#define DRIVE_PRIORITY 2
 
 // I2C Pins
 #define SDA 21

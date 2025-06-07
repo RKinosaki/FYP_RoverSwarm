@@ -20,8 +20,8 @@ y_end = 700
 ## Initialised position
 obstx = [0, 0] #In the order of L R
 obsty = [0, 0]
-posx = [0]
-posy = [0]
+posx = [0, 0]
+posy = [0, 0]
 
 def findObstaclePosition(obst, yaw):
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
@@ -35,13 +35,17 @@ def findPosition(segment, yaw):
     posx.append(posx[-1]+segment*math.sin(yaw))
     posy.append(posy[-1]+segment*math.cos(yaw))
 
-
-
 def updatePlots(frame):
-    global graph
-    global posgraph
+    global graph, posgraph
     graph.set_offsets(list(zip(obstx,obsty)))
     posgraph.set_offsets(list(zip(posx, posy)))
+    pt1 = (posx[-2], posy[-2])
+    pt2 = (posx[-1],posy[-1])
+    dist2pts = math.dist(pt1, pt2)
+
+    if(dist2pts > 1 and dist2pts < 100):
+        ax.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c='r')
+    
 
 
 def receive_data():
@@ -58,7 +62,7 @@ def receive_data():
                         line = line.strip()
                         data = json.loads(line)
                         print("Parsed JSON:", data)
-                        yaw = data["yaw"]
+                        yaw = 15.7*data["yaw"]
                         segment = data["travelled"]-prevTravelled
                         prevTravelled = data["travelled"]
                         findPosition(segment, yaw)
