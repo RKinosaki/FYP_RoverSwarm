@@ -18,18 +18,18 @@ x_end = 700
 y_end = 700
 
 ## Initialised position
-obstx = [0, 0] #In the order of L R
-obsty = [0, 0]
+obstx = [0, 0, 0, 0] #In the order of L R
+obsty = [0, 0, 0, 0]
 posx = [0, 0]
 posy = [0, 0]
 
 def findObstaclePosition(obst, yaw):
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
     ## L = 0.1*distance (in cm)*cos(45+yaw), 0.1*distance*sin(45+yaw)
-    obstx.append(posx[-1]+0.1*obst[0]*math.cos((3*math.pi/4)+yaw))
-    obsty.append(posy[-2]+0.1*obst[0]*math.sin((3*math.pi/4+yaw)))
-    obstx.append(posx[-1]+0.1*obst[0]*math.cos((math.pi/4)+yaw))
-    obsty.append(posy[-2]+0.1*obst[0]*math.sin((math.pi/4+yaw)))
+    obstx.append(posx[-1]+obst[0]*math.cos((3*math.pi/4)+yaw))
+    obsty.append(posy[-2]+obst[0]*math.sin((3*math.pi/4)+yaw))
+    obstx.append(posx[-1]+obst[0]*math.cos((math.pi/4)+yaw))
+    obsty.append(posy[-2]+obst[0]*math.sin((math.pi/4+yaw)))
 
 def findPosition(segment, yaw):
     posx.append(posx[-1]+segment*math.sin(yaw))
@@ -37,19 +37,22 @@ def findPosition(segment, yaw):
 
 def updatePlots(frame):
     global graph, posgraph
-    graph.set_offsets(list(zip(obstx,obsty)))
     posgraph.set_offsets(list(zip(posx, posy)))
-    pt1 = (posx[-2], posy[-2])
-    pt2 = (posx[-1],posy[-1])
-    dist2pts = math.dist(pt1, pt2)
+    filterOutliers((obstx[-2], obsty[-2]), (obstx[-4], obsty[-4]))
+    filterOutliers((obstx[-1], obsty[-1]), (obstx[-3], obsty[-3]))
+    ax.plot([posx[-2], posx[-1]], [posy[-2], posy[-1]], c='r')    
 
+def filterOutliers(pt_i, pt_i_min_1):
+    dist2pts = math.dist(pt_i, pt_i_min_1)
     if(dist2pts > 1 and dist2pts < 100):
-        ax.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c='r')
+        graph.set_offsets(list(zip(obstx,obsty)))
+        
     
 
 
 def receive_data():
     prevTravelled = 0
+    yaw_scaler = 15.7
 
     while True:
         print('waiting for connection')
@@ -62,9 +65,10 @@ def receive_data():
                         line = line.strip()
                         data = json.loads(line)
                         print("Parsed JSON:", data)
-                        yaw = 15.7*data["yaw"]
-                        segment = data["travelled"]-prevTravelled
-                        prevTravelled = data["travelled"]
+                        yaw = yaw_scaler*data["yaw"]
+                        travelled = (data["encoder"][0]+data["encoder"][1])/2
+                        segment = travelled-prevTravelled
+                        prevTravelled = travelled
                         findPosition(segment, yaw)
                         findObstaclePosition(data["distance"], yaw)
                         updatePlots(frame=None)

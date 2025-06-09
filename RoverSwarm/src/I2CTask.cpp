@@ -29,7 +29,7 @@ void setupIMU(){
   xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
   RoverState.status = 0;
   xSemaphoreGive(RoverState.mutex);
-  Serial.println("MPU6050 Found");
+  // Serial.println("MPU6050 Found");
 }
 
 void setupDistL() {
@@ -93,7 +93,7 @@ void measureDistL() {
 
 void measureIMU(){
   sensors_event_t a, g, temp;
-  float dt = 0.02;
+  float dt = 0.01;
   // Attempt to get sensor readings.
   bool readSuccess = imu.getEvent(&a, &g, &temp);
   if (!readSuccess) {
@@ -154,12 +154,6 @@ void measureSensor(void *pvParameters) {
         }
         else{
         measureIMU();
-        // Serial.println(RoverState.ax);
-        // Serial.println(RoverState.ay);
-        // Serial.println(RoverState.az);
-        // Serial.println(RoverState.gx);
-        // Serial.println(RoverState.gy);
-        // Serial.println(RoverState.gz);
         }
       }
     }

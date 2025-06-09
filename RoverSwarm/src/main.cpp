@@ -73,6 +73,23 @@ void setupI2C(){
   I2CMux.closeAll();
 }
 
+void initialiseData(){
+  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+  RoverState.distanceL = 0;
+  RoverState.distanceR= 0;
+  RoverState.yaw= 0;
+  RoverState.encoderL = 0;
+  RoverState.encoderR= 0;
+  RoverState.photon0 = 0;
+  RoverState.photon1 = 0;
+  RoverState.photon2 = 0;
+  RoverState.photon3  = 0;
+  RoverState.command = 's';
+  RoverState.status = 0;
+  xSemaphoreGive(RoverState.mutex);
+}
+
+
 void setupPWM(){
   ledcSetup(0, 1000, 8);
   ledcSetup(1, 1000, 8);
@@ -134,7 +151,8 @@ void setup() {
     RoverState. status = 0;
   }
   setupI2C();
-  setupPWM();
+  setupPWM(); 
+  initialiseData();
   
   
 
@@ -203,7 +221,6 @@ void setup() {
     &reflectTaskHandle             // Pointer
   );
 #endif
-
 
 
 }

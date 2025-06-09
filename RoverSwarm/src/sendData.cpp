@@ -22,7 +22,8 @@ void updatePackage(){
   package["Photon"][1] = RoverState.photon1;
   package["Photon"][2] = RoverState.photon2;
   package["Photon"][3] = RoverState.photon3;
-  package["travelled"] = RoverState.travelled;
+  package["encoder"][0] = RoverState.encoderL;
+  package["encoder"][1] = RoverState.encoderR;
   package["status"] = RoverState.status;
 }
 

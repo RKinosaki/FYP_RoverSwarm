@@ -29,7 +29,8 @@ struct sysState {
     volatile float distanceL = 0;
     volatile float distanceR = 0;
     volatile float yaw = 0;
-    volatile float travelled = 0;
+    volatile float encoderL = 0;
+    volatile float encoderR = 0;
     volatile float photon0 = 0;
     volatile float photon1 = 0;
     volatile float photon2 = 0;
