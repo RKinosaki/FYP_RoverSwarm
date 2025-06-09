@@ -9,10 +9,12 @@ volatile int encoderCountL = 0;
 volatile int encoderCountR = 0;
 int prevCountR = 0;
 int prevCountL = 0;
-const float K_P = 0.5;
-const float K_D = 0.3;
+const float K_P = 0.2;
+const float K_D = 0.1;
 float prevError = 0;
 int basePWM = 128;
+const float gain = 0.05;
+const int ethreshold = 200;
 
 volatile bool controlFlag = false;
 
@@ -51,22 +53,21 @@ void drive(){
     int distanceR = RoverState.distanceR;
     xSemaphoreGive(RoverState.mutex);
     if(distanceL==0 and distanceR==0){
-      ledcWrite(0, 0);
-      ledcWrite(1, 0);
-      ledcWrite(2, 0);
-      ledcWrite(3, 0);
+      ledcWrite(0, basePWM);
+        ledcWrite(1, 0);
+        ledcWrite(2, 0);
+        ledcWrite(3, basePWM);
     }
     else{
       int error = distanceL-distanceR;
-      if(error<100 and error > -100){
+      if(error<ethreshold and error > -ethreshold){
         ledcWrite(0, 0);
         ledcWrite(1, basePWM);
         ledcWrite(2, basePWM);
         ledcWrite(3, 0);
-        Serial.println("Within acceptable margins");
       }
       else{
-        float comp = 0.1*(K_P*error + K_D*(error-prevError/HARDWARE_TIMER_PRESCALER));
+        float comp = gain*(K_P*error + K_D*(error-prevError/HARDWARE_TIMER_PRESCALER));
         prevError = error;
         if(comp<0){
           ledcWrite(0 , 0);
@@ -116,7 +117,7 @@ void driveRover(void *pvParameters) {
         drive();
       }
       float distanceR = (PI*TYRE_DIAMETER*encoderCountR)/(ENCODER_RES);
-      float distanceL = (PI*TYRE_DIAMETER*encoderCountL/(ENCODER_RES));
+      float distanceL = -(PI*TYRE_DIAMETER*encoderCountL/(ENCODER_RES));
       if(distanceR != prevCountR){
         // Serial.println("Right Encoder count is: ");
         // Serial.println(distanceR);

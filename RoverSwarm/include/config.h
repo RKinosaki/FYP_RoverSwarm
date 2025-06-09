@@ -23,7 +23,7 @@
 
 // I2C task
 #define I2C_ENABLE true
-#define I2C_FREQ 100
+#define I2C_FREQ 400
 #define I2C_PRIORITY 1
 #define EN_TOF_R true
 #define EN_TOF_L true
@@ -36,7 +36,7 @@
 
 //DRIVE task
 #define DRIVE_ENABLE true
-#define DRIVE_FREQ 200
+#define DRIVE_FREQ 400
 #define DRIVE_PRIORITY 2
 
 // I2C Pins

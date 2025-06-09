@@ -26,10 +26,10 @@ posy = [0, 0]
 def findObstaclePosition(obst, yaw):
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
     ## L = 0.1*distance (in cm)*cos(45+yaw), 0.1*distance*sin(45+yaw)
-    obstx.append(posx[-1]+obst[0]*math.cos((3*math.pi/4)+yaw))
-    obsty.append(posy[-2]+obst[0]*math.sin((3*math.pi/4)+yaw))
-    obstx.append(posx[-1]+obst[0]*math.cos((math.pi/4)+yaw))
-    obsty.append(posy[-2]+obst[0]*math.sin((math.pi/4+yaw)))
+    obstx.append(posx[-1]+0.1*obst[0]*math.cos((3*math.pi/4)+yaw))
+    obsty.append(posy[-2]+0.1*obst[0]*math.sin((3*math.pi/4)+yaw))
+    obstx.append(posx[-1]+0.1*obst[0]*math.cos((math.pi/4)+yaw))
+    obsty.append(posy[-2]+0.1*obst[0]*math.sin((math.pi/4+yaw)))
 
 def findPosition(segment, yaw):
     posx.append(posx[-1]+segment*math.sin(yaw))
