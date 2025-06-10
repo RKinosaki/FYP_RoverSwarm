@@ -93,8 +93,9 @@ void measureSensor(void *pvParameters) {
         // Serial.print(RoverState.distanceR);
         // Serial.println();
         }
-      }
-      if(EN_IMU){
+        if(EN_IMU){
         measureIMU();
+        }
       }
+      
 }
