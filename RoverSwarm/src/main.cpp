@@ -5,6 +5,9 @@
 #include "Wire.h"
 #include "WiFi.h"
 #include "TCA9548A.h"
+#include <VL53L1X.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
 
 #include "freertos/task.h"
 
@@ -17,6 +20,8 @@ const char* password = "bobcat2025";
 //Constructor declarations
 WiFiClient client;
 TCA9548A I2CMux;
+VL53L1X ToF_L, ToF_R;
+Adafruit_MPU6050 imu;
 
 sysState RoverState;
 
@@ -102,6 +107,57 @@ void setupPWM(){
   ledcAttachPin(MR_N, 3);
 }
 
+void setupSensors(){
+
+  if(EN_IMU){
+    I2CMux.openChannel(Channel_IMU);
+    if (!imu.begin()){     //Initialise IMU
+        Serial.println("Failed to initialize MPU6050");
+        xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+        RoverState.status=2;
+        xSemaphoreGive(RoverState.mutex);
+    }
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.status = 0;
+    xSemaphoreGive(RoverState.mutex);
+    I2CMux.closeChannel(Channel_IMU);
+  }
+
+  if(EN_TOF_L){
+    I2CMux.openChannel(Channel_ToF_L);
+    if (!ToF_L.init()){
+      Serial.println("Failed to detect and initalise sensor!");
+      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+      RoverState.status=2;
+      xSemaphoreGive(RoverState.mutex);
+    }
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.status = 0;
+    xSemaphoreGive(RoverState.mutex);
+    ToF_L.setDistanceMode(VL53L1X::Short);
+    ToF_L.setMeasurementTimingBudget(20000);
+    ToF_L.startContinuous(20);
+    I2CMux.closeChannel(Channel_ToF_L);
+  }
+
+  if(EN_TOF_R){
+    I2CMux.openChannel(Channel_ToF_R);
+    if (!ToF_R.init()){
+      Serial.println("Right sensor failed to detect and initalise sensor!");
+      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+      RoverState.status=2;
+      xSemaphoreGive(RoverState.mutex);
+    }
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.status = 0;
+    xSemaphoreGive(RoverState.mutex);
+    ToF_R.setDistanceMode(VL53L1X::Short);
+    ToF_R.setMeasurementTimingBudget(20000);
+    ToF_R.startContinuous(20);
+    I2CMux.closeChannel(Channel_ToF_R);
+  }
+}
+
 void setup() {
   delay(1000);
   Serial.begin(115200);
@@ -151,6 +207,7 @@ void setup() {
     RoverState. status = 0;
   }
   setupI2C();
+  setupSensors();
   setupPWM(); 
   initialiseData();
   

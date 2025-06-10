@@ -10,64 +10,15 @@
 
 
 
-VL53L1X ToF_L, ToF_R;
+extern VL53L1X ToF_L, ToF_R;
 extern TCA9548A I2CMux;
-Adafruit_MPU6050 imu;  //Initialise Object
+extern Adafruit_MPU6050 imu;  //Initialise Object
 
 // === GLOBAL VARIABLES === //
 // Task handles
 TaskHandle_t I2CTaskHandle = nullptr;
 
-void setupSensors(){
 
-  if(EN_IMU){
-    I2CMux.openChannel(Channel_IMU);
-    if (!imu.begin()){     //Initialise IMU
-        Serial.println("Failed to initialize MPU6050");
-        xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-        RoverState.status=2;
-        xSemaphoreGive(RoverState.mutex);
-    }
-    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-    RoverState.status = 0;
-    xSemaphoreGive(RoverState.mutex);
-    I2CMux.closeChannel(Channel_IMU);
-  }
-
-  if(EN_TOF_L){
-    I2CMux.openChannel(Channel_ToF_L);
-    if (!ToF_L.init()){
-      Serial.println("Failed to detect and initalise sensor!");
-      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-      RoverState.status=2;
-      xSemaphoreGive(RoverState.mutex);
-    }
-    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-    RoverState.status = 0;
-    xSemaphoreGive(RoverState.mutex);
-    ToF_L.setDistanceMode(VL53L1X::Short);
-    ToF_L.setMeasurementTimingBudget(20000);
-    ToF_L.startContinuous(20);
-    I2CMux.closeChannel(Channel_ToF_L);
-  }
-
-  if(EN_TOF_R){
-    I2CMux.openChannel(Channel_ToF_R);
-    if (!ToF_R.init()){
-      Serial.println("Right sensor failed to detect and initalise sensor!");
-      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-      RoverState.status=2;
-      xSemaphoreGive(RoverState.mutex);
-    }
-    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-    RoverState.status = 0;
-    xSemaphoreGive(RoverState.mutex);
-    ToF_R.setDistanceMode(VL53L1X::Short);
-    ToF_R.setMeasurementTimingBudget(20000);
-    ToF_R.startContinuous(20);
-    I2CMux.closeChannel(Channel_ToF_R);
-  }
-}
 
 void measureDistR() {
   I2CMux.openChannel(Channel_ToF_R);
