@@ -46,6 +46,13 @@ void IRAM_ATTR sampleEncoderISRL(){
         }
     }
 
+void stop(){
+  ledcWrite(0, 0);
+  ledcWrite(1, 0);
+  ledcWrite(2, 0);
+  ledcWrite(3, 0);
+}
+
 
 void drive(){
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
@@ -113,8 +120,16 @@ void driveRover(void *pvParameters) {
       vTaskDelayUntil(&xLastWakeTime, xFrequency);
       bool controlFlag_ = controlFlag;
     //   Serial.println(controlFlag_);
-      if(controlFlag_){
-        drive();
+      xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+      Serial.println(RoverState.command);
+      xSemaphoreGive(RoverState.mutex);
+      if(RoverState.command=='s'){
+        stop();
+      }
+      else{
+        if(controlFlag_){
+          drive();
+        }
       }
       float distanceR = (PI*TYRE_DIAMETER*encoderCountR)/(ENCODER_RES);
       float distanceL = -(PI*TYRE_DIAMETER*encoderCountL/(ENCODER_RES));

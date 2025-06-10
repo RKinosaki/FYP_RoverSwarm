@@ -84,7 +84,7 @@ void initialiseData(){
   RoverState.photon1 = 0;
   RoverState.photon2 = 0;
   RoverState.photon3  = 0;
-  RoverState.command = 's';
+  RoverState.command = 'a';
   RoverState.status = 0;
   xSemaphoreGive(RoverState.mutex);
 }

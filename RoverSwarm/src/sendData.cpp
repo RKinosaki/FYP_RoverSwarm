@@ -10,11 +10,12 @@
 // Task handles
 TaskHandle_t sendDataTaskHandle = nullptr;
 extern WiFiClient client;
-
+char prevCommand = 's';
 
 JsonDocument package;
 
 void updatePackage(){
+  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
   package["distance"][0] = RoverState.distanceL;
   package["distance"][1] = RoverState.distanceR;
   package["yaw"] = RoverState.yaw;
@@ -25,7 +26,19 @@ void updatePackage(){
   package["encoder"][0] = RoverState.encoderL;
   package["encoder"][1] = RoverState.encoderR;
   package["status"] = RoverState.status;
+  xSemaphoreGive(RoverState.mutex);
 }
+
+// void receiveCommand(){
+//   char command = client.read();
+//   if(command != prevCommand){
+//     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+//     RoverState.command = client.read();
+//     Serial.println(RoverState.command);
+//     xSemaphoreGive(RoverState.mutex);
+//     prevCommand = command;
+//   }
+// }
 
 
 void sendData(void *pvParameters) {
@@ -42,6 +55,5 @@ void sendData(void *pvParameters) {
       // serializeJson(package, Serial);
       serializeJson(package, client);
       client.write('\n');
-      xSemaphoreGive(RoverState.mutex);
     }
 }

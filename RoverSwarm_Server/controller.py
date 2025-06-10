@@ -1,16 +1,16 @@
 import socket
 import json
-import asyncio
 import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
+import time
 
 ##create tcp socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ##address found from the ip seen on phone hotspot
 server_address = ('0.0.0.0', 50)
-print('starting up on ', server_address)
+print("starting up on: ", server_address)
 sock.bind(server_address)
 sock.listen(10)
 
@@ -46,14 +46,22 @@ def filterOutliers(pt_i, pt_i_min_1):
     dist2pts = math.dist(pt_i, pt_i_min_1)
     if(dist2pts > 1 and dist2pts < 100):
         graph.set_offsets(list(zip(obstx,obsty)))
+
+def sendCommand(connection, char):
+    if connection:
+        try:
+            connection.sendall(char.encode())
+            print(f"Sent Command: {char}")
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        print("No rover connected")
         
-    
 
-
-def receive_data():
+def receiveData():
     prevTravelled = 0
     yaw_scaler = 15.7
-
+    startFlag = True
     while True:
         print('waiting for connection')
         connection, client_address = sock.accept()
@@ -77,7 +85,8 @@ def receive_data():
         finally:
             connection.close()    
 
-thread = threading.Thread(target=receive_data, daemon=True)
+
+thread = threading.Thread(target=receiveData, daemon=True)
 thread.start()
 
 fig, ax = plt.subplots()
