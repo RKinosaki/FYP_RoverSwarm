@@ -7,7 +7,7 @@
 #define HARDWARE_TIMER_PRESCALER 80
 
 // LED Task
-#define LED_ENABLE true
+#define LED_ENABLE false
 #define LED_FREQ 1
 #define LED_PRIORITY 5
 
@@ -18,7 +18,7 @@
 
 //SendData Task
 #define SEND_DATA true
-#define DATA_FREQ 4
+#define DATA_FREQ 6
 #define DATA_PRIORITY 3
 
 // I2C task

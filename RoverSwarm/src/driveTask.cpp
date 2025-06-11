@@ -9,12 +9,14 @@ volatile int encoderCountL = 0;
 volatile int encoderCountR = 0;
 int prevCountR = 0;
 int prevCountL = 0;
-const float K_P = 0.2;
-const float K_D = 0.1;
+const float K_P = 0.5;
+const float K_D = 0.2;
 float prevError = 0;
 int basePWM = 128;
+const int maxPWM = 196;
 const float gain = 0.05;
-const int ethreshold = 200;
+const int ethreshold = 50;
+const int dthreshold = 100;
 
 volatile bool controlFlag = false;
 
@@ -59,44 +61,36 @@ void drive(){
     int distanceL = RoverState.distanceL;
     int distanceR = RoverState.distanceR;
     xSemaphoreGive(RoverState.mutex);
-    if(distanceL==0 and distanceR==0){
-      ledcWrite(0, basePWM);
-        ledcWrite(1, 0);
-        ledcWrite(2, 0);
-        ledcWrite(3, basePWM);
+    int error = distanceL-distanceR;
+    if(error<ethreshold and error > -ethreshold){
+      ledcWrite(0, 0);
+      ledcWrite(1, basePWM);
+      ledcWrite(2, basePWM);
+      ledcWrite(3, 0);
     }
     else{
-      int error = distanceL-distanceR;
-      if(error<ethreshold and error > -ethreshold){
-        ledcWrite(0, 0);
-        ledcWrite(1, basePWM);
-        ledcWrite(2, basePWM);
-        ledcWrite(3, 0);
-      }
-      else{
-        float comp = gain*(K_P*error + K_D*(error-prevError/HARDWARE_TIMER_PRESCALER));
-        prevError = error;
-        if(comp<0){
-          ledcWrite(0 , 0);
-          ledcWrite(1, constrain(basePWM - comp, 48, 255)); //left motor change
-          ledcWrite(2, 0);
-          ledcWrite(3, constrain(basePWM + comp, 48, 255));
+      float comp = gain*(K_P*error + K_D*((error-prevError)/HARDWARE_TIMER_PRESCALER));
+      prevError = error;
+      if(comp<0){
+        ledcWrite(0 , 0);
+        ledcWrite(1, constrain(basePWM - comp, 48, maxPWM)); //left motor change
+        ledcWrite(2, 0);
+        ledcWrite(3, constrain(basePWM + comp, 48, maxPWM));
           // Serial.print("0: 0, 1:");
           // Serial.print(basePWM-comp);
           // Serial.print("2:0, 3:");
           // Serial.println(basePWM + comp);
-        }
-        else{
-          ledcWrite(0, constrain(basePWM-comp, 40, 255));
-          ledcWrite(1, 0);
-          ledcWrite(2, constrain(basePWM + comp, 40, 255)); //right motor change
-          ledcWrite(3, 0);
+      }
+      else{
+        ledcWrite(0, constrain(basePWM-comp, 40, maxPWM));
+        ledcWrite(1, 0);
+        ledcWrite(2, constrain(basePWM + comp, 40, maxPWM)); //right motor change
+        ledcWrite(3, 0);
           // Serial.print("0: ");
           // Serial.print(basePWM-comp);
           // Serial.print("1:0, 2:");
           // Serial.print(basePWM + comp);
           // Serial.println("3:0");
-        }
       }
     }
     
