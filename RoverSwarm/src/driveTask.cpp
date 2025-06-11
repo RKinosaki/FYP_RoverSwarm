@@ -15,7 +15,7 @@ float prevError = 0;
 int basePWM = 128;
 const int maxPWM = 196;
 const float gain = 0.05;
-const int ethreshold = 50;
+const int ethreshold = 76;
 const int dthreshold = 100;
 
 volatile bool controlFlag = false;

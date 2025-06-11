@@ -42,12 +42,14 @@ def checkquadrant(yaw, margin):
         return 2
 
 def findObstaclePosition(obst, yaw):
+    offset_left = 140
+    offset_right = 50
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
     ## L = 0.1*distance (in cm)*cos(45+yaw), 0.1*distance*sin(45+yaw)
-    obstx_L[-1].append(posx[-1]+1*obst[0]*math.cos((3*math.pi/4)-yaw))
-    obsty_L[-1].append(posy[-2]+1*obst[0]*math.sin((3*math.pi/4)-yaw))
-    obstx_R[-1].append(posx[-1]+1*obst[1]*math.cos((math.pi/4)-yaw))
-    obsty_R[-1].append(posy[-2]+1*obst[1]*math.sin((math.pi/4)-yaw))
+    obstx_L[-1].append(posx[-1]+1*obst[0]*math.cos(((offset_left*math.pi)/180)-yaw))
+    obsty_L[-1].append(posy[-2]+1*obst[0]*math.sin(((offset_left*math.pi)/180)-yaw))
+    obstx_R[-1].append(posx[-1]+1*obst[1]*math.cos(((offset_right*math.pi)/180)-yaw))
+    obsty_R[-1].append(posy[-2]+1*obst[1]*math.sin(((offset_right*math.pi)/180)-yaw))
 
 def findPosition(segment, yaw):
     posx.append(posx[-1]+segment*math.sin(yaw))
@@ -113,6 +115,9 @@ def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R):
             else:
                 line_y_R = lr_R.predict(arrX_R.reshape(-1, 1))
                 plt.plot(arrX_R, line_y_R, label="Right Wall" + str(i), color='blue')
+    plt.title("Mapping data using linear regression")
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.xlim(-x_end, x_end)
     plt.ylim(-y_end, y_end)
     plt.legend(loc = "lower right")
@@ -126,12 +131,14 @@ def filterPoints(points, radius, min_neighbours):
     inliers = [pt for i, pt in enumerate(points) if len(neighbours[i]) >= min_neighbours]
     return np.array(inliers)
 
-def showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R):
+def showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy):
     fig, ax = plt.subplots()
     plt.xlim(-x_end, x_end)
     plt.ylim(-y_end, y_end)
     wall_L = ax.scatter(obstx_L[-1], obsty_L[-1], marker='.', s=1, label = "left side", c='blue')
-    wall_R = ax.scatter(obstx_R[-1], obsty_R[-1], marker = '.', s=1, label = "right side", c='green')     
+    wall_R = ax.scatter(obstx_R[-1], obsty_R[-1], marker = '.', s=1, label = "right side", c='green') 
+
+    ax.plot(posx, posy, label='path', c='red')
     pointLx = []
     pointLy = []
     pointRx = []
@@ -238,7 +245,7 @@ wall_R = ax.scatter(obstx_R[-1], obsty_R[-1], marker = '.', s=1, c='green')
 posgraph = ax.scatter(posx, posy, marker='.', s=1, c='red')
 anim = FuncAnimation(fig, updatePlots, frames=None)
 plt.show()  
-showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R)
+showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
 createGrid(obstx_L, obsty_L, obstx_R, obsty_R)
 # RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
 
