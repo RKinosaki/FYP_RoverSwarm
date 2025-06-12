@@ -134,6 +134,7 @@ void setupSensors(){
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     RoverState.status = 0;
     xSemaphoreGive(RoverState.mutex);
+    ToF_L.setROISize(4, 4);
     ToF_L.setDistanceMode(VL53L1X::Short);
     ToF_L.setMeasurementTimingBudget(20000);
     ToF_L.startContinuous(20);
@@ -152,6 +153,7 @@ void setupSensors(){
     RoverState.status = 0;
     xSemaphoreGive(RoverState.mutex);
     ToF_R.setDistanceMode(VL53L1X::Short);
+    ToF_R.setROISize(4, 4);
     ToF_R.setMeasurementTimingBudget(20000);
     ToF_R.startContinuous(20);
     I2CMux.closeChannel(Channel_ToF_R);

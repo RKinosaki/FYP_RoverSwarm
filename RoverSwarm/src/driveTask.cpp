@@ -9,14 +9,16 @@ volatile int encoderCountL = 0;
 volatile int encoderCountR = 0;
 int prevCountR = 0;
 int prevCountL = 0;
-const float K_P = 0.5;
-const float K_D = 0.2;
+const float K_P = 0.6;
+const float K_D = 1;
 float prevError = 0;
-int basePWM = 128;
+int basePWM = 96;
 const int maxPWM = 196;
-const float gain = 0.05;
-const int ethreshold = 76;
-const int dthreshold = 100;
+const float gain = 0.01;
+const int ethreshold = 90;
+const int dthreshold = 40;
+int prevDistL = 0;
+int prevDistR = 0;
 
 volatile bool controlFlag = false;
 
@@ -62,11 +64,27 @@ void drive(){
     int distanceR = RoverState.distanceR;
     xSemaphoreGive(RoverState.mutex);
     int error = distanceL-distanceR;
+    if(distanceL > 500){
+      distanceL = prevDistL;
+    }
+    else if(distanceR > 500){
+      distanceR = prevDistR;
+    }
+    else{
+      prevDistL = distanceL;
+      prevDistR = distanceR;
+    }
     if(error<ethreshold and error > -ethreshold){
       ledcWrite(0, 0);
       ledcWrite(1, basePWM);
       ledcWrite(2, basePWM);
       ledcWrite(3, 0);
+    }
+    else if(distanceR< dthreshold and distanceL < dthreshold){
+      ledcWrite(0, basePWM);
+      ledcWrite(1, 0);
+      ledcWrite(2, 0);
+      ledcWrite(3, basePWM);
     }
     else{
       float comp = gain*(K_P*error + K_D*((error-prevError)/HARDWARE_TIMER_PRESCALER));
@@ -143,6 +161,9 @@ void driveRover(void *pvParameters) {
         xSemaphoreGive(RoverState.mutex);
         prevCountL = distanceL;
       }
+      TickType_t endTask = xTaskGetTickCount();
+      Serial.println("DriveTask Timing");
+      Serial.println(xLastWakeTime-endTask);
     }
     
 }

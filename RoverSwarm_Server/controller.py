@@ -16,8 +16,8 @@ print("starting up on: ", server_address)
 sock.bind(server_address)
 sock.listen(10)
 
-x_end = 2000
-y_end = 1000
+x_end = 300
+y_end = 300
 
 ## Initialised position
 obstx_L = [[0, 0]]
@@ -25,7 +25,7 @@ obstx_R = [[0, 0]]
 obsty_L = [[0, 0]]
 obsty_R = [[0, 0]]
 posx = [0, 0]
-posy = [0, 0]
+posy = [-150, -150]
 
 def checkquadrant(yaw, margin):
     while(yaw<(-3*math.pi/4)):
@@ -58,17 +58,16 @@ def findPosition(segment, yaw):
 def updatePlots(frame):
     global wall_R, wall_L, posgraph
     posgraph.set_offsets(list(zip(posx, posy)))
-    filterOutliers((obstx_L[-1][-1], obstx_L[-1][-1]), (obstx_L[-1][-2], obsty_L[-1][-2]), "L")
-    filterOutliers((obstx_R[-1][-1], obsty_R[-1][-1]), (obstx_R[-1][-2], obsty_R[-1][-2]), "R")
+    filterOutliers((obstx_L[-1][-1], obsty_L[-1][-1]), "L")
+    filterOutliers((obstx_R[-1][-1], obsty_R[-1][-1]), "R")
     ax.plot([posx[-2], posx[-1]], [posy[-2], posy[-1]], c='r')
 
-def filterOutliers(pt_i, pt_i_min_1, side):
-    # dist2pts = math.dist(pt_i, pt_i_min_1)
-    # if(dist2pts > 1 and dist2pts < 250):
-    if(side == "L"):
-        wall_L.set_offsets(list(zip(obstx_L[-1], obsty_L[-1])))
-    elif(side=="R"):
-        wall_R.set_offsets(list(zip(obstx_R[-1], obsty_R[-1])))
+def filterOutliers(pt_i, side):
+    if(pt_i[0] < x_end and pt_i[1]<y_end):
+        if(side == "L"):
+            wall_L.set_offsets(list(zip(obstx_L[-1], obsty_L[-1])))
+        elif(side=="R"):
+            wall_R.set_offsets(list(zip(obstx_R[-1], obsty_R[-1])))
 
 def sendCommand(connection, char):
     if connection:
@@ -82,7 +81,7 @@ def sendCommand(connection, char):
         
 def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R): 
     threshold = 6
-    angle = math.pi/6
+    angle = math.pi/4
     lowangle = math.tan(angle)
     highangle = math.tan((math.pi/2) - angle)
     for i in range(len(obstx_L)):
@@ -131,6 +130,20 @@ def filterPoints(points, radius, min_neighbours):
     inliers = [pt for i, pt in enumerate(points) if len(neighbours[i]) >= min_neighbours]
     return np.array(inliers)
 
+
+def removePointsInPath(points, path, radius):
+    filteredPoints = []
+    for pts in points:
+        inPath = False
+        for p in path:
+            if(math.dist(p, pts) <= radius):
+                inPath = True
+                break
+        if not inPath:
+            filteredPoints.append(pts)
+    return np.array(filteredPoints)
+
+
 def showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy):
     fig, ax = plt.subplots()
     plt.xlim(-x_end, x_end)
@@ -164,17 +177,21 @@ def showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy):
     plt.show()
 
 
-def createGrid(obstx_L, obsty_L, obstx_R, obsty_R):
-    resolution = 5
+def createGrid(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy):
+    path = np.array(list(zip(posx, posy)))
+    resolution = 10
     points = []
     for i in range(len(obstx_L)):
         for x, y in zip(obstx_L[i], obsty_L[i]):
-            points.append((x, y))
+            if(x<x_end and y<y_end):
+                points.append((x, y))
     for i in range(len(obsty_R)):
         for x, y in zip(obstx_R[i], obsty_R[i]):
-            points.append((x, y))
+            if(x<x_end and y<y_end):
+                points.append((x, y))
     points = np.array(points)
-    points = filterPoints(points, 40, 5)
+    points = filterPoints(points, 40, 4)
+    points = removePointsInPath(points, path, 40)
     x_min, x_max, y_min, y_max = points[:, 0].min(), points[:, 0].max(), points[:, 1].min(), points[:, 1].max()
     x_size = int(np.ceil((x_max-x_min)/resolution))
     y_size = int(np.ceil((y_max-y_min)/resolution))
@@ -202,7 +219,7 @@ def receiveData():
     prevQuadrant = 0
     prevTravelled = 0
     yaw_scaler = 15.7
-    startFlag = True
+    yaw_0 = math.pi/2
     while True:
         print('waiting for connection')
         connection, client_address = sock.accept()
@@ -214,7 +231,7 @@ def receiveData():
                         line = line.strip()
                         data = json.loads(line)
                         print("Parsed JSON:", data)
-                        yaw = yaw_scaler*data["yaw"]
+                        yaw = yaw_0 + yaw_scaler*data["yaw"]
                         prevQuadrant = quadrant
                         quadrant = checkquadrant(yaw, 0.15)
                         if prevQuadrant != quadrant:
@@ -242,10 +259,10 @@ plt.xlim(-x_end, x_end)
 plt.ylim(-y_end, y_end)
 wall_L = ax.scatter(obstx_L[-1], obsty_L[-1], marker='.', s=1, c='blue')
 wall_R = ax.scatter(obstx_R[-1], obsty_R[-1], marker = '.', s=1, c='green')
-posgraph = ax.scatter(posx, posy, marker='.', s=1, c='red')
+posgraph = ax.scatter(posx, posy, marker='.', s=100, c='red')
 anim = FuncAnimation(fig, updatePlots, frames=None)
 plt.show()  
 showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
-createGrid(obstx_L, obsty_L, obstx_R, obsty_R)
+createGrid(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
 # RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
 

@@ -39,7 +39,7 @@ void checkstatus(){
  
 void ledIndicate(void *pvParameters) {
     (void)pvParameters;
-
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     /* Make the task execute at a specified frequency */
     const TickType_t xDelay = pdMS_TO_TICKS(100);
     for (;;)
@@ -54,5 +54,8 @@ void ledIndicate(void *pvParameters) {
             count = 0;
             pinMode(LED_PIN, LOW);
         }
+        TickType_t endTask = xTaskGetTickCount();
+      Serial.println("LEDTask Timing");
+      Serial.println(xLastWakeTime-endTask);
     }
 }

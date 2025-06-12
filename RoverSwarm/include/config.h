@@ -36,7 +36,7 @@
 
 //DRIVE task
 #define DRIVE_ENABLE true
-#define DRIVE_FREQ 100
+#define DRIVE_FREQ 50
 #define DRIVE_PRIORITY 2
 
 // I2C Pins

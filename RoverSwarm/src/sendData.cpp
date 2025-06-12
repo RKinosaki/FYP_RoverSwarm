@@ -55,5 +55,8 @@ void sendData(void *pvParameters) {
       // serializeJson(package, Serial);
       serializeJson(package, client);
       client.write('\n');
+      TickType_t endTask = xTaskGetTickCount();
+      Serial.println("sendData Timing");
+      Serial.println(xLastWakeTime-endTask);
     }
 }

@@ -97,5 +97,8 @@ void measureSensor(void *pvParameters) {
         measureIMU();
         }
       }
+    TickType_t endTask = xTaskGetTickCount();
+    Serial.println("I2cTask Timing");
+    Serial.println(xLastWakeTime-endTask);
       
 }
