@@ -17,7 +17,8 @@ extern Adafruit_MPU6050 imu;  //Initialise Object
 // === GLOBAL VARIABLES === //
 // Task handles
 TaskHandle_t I2CTaskHandle = nullptr;
-
+const uint8_t avgFilterLength = 4;
+float prevYaw[avgFilterLength];
 
 
 void measureDistR() {
@@ -50,15 +51,24 @@ void measureIMU(){
   I2CMux.openChannel(Channel_IMU);
   sensors_event_t a, g, temp;
   float dt = 0.01;
+  float sum = 0;
   // Attempt to get sensor readings.
   bool readSuccess = imu.getEvent(&a, &g, &temp);
   if (!readSuccess) {
     Serial.println("Failed to get sensor event");
   } else {
+    for(int i=0; i<avgFilterLength-1; i++){
+      prevYaw[i+1] = prevYaw[i];
+    }
+    
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     float localRoverYaw = RoverState.yaw;
     xSemaphoreGive(RoverState.mutex);
-    localRoverYaw+=g.gyro.z*dt;  
+    prevYaw[0] = localRoverYaw + g.gyro.z*dt;  
+    for(int i=0; i<avgFilterLength; i++){
+      sum+=prevYaw[i];
+    }
+    localRoverYaw = sum/avgFilterLength;
     xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
     RoverState.yaw = localRoverYaw;
     xSemaphoreGive(RoverState.mutex);

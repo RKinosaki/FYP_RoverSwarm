@@ -208,7 +208,8 @@ void setup() {
     setupCommunication();
     RoverState. status = 0;
   }
-  scanI2C();
+  // scanI2C();
+  delay(3000);
   setupI2C();
   setupSensors();
   setupPWM(); 

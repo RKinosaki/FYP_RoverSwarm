@@ -16,6 +16,7 @@ JsonDocument package;
 
 void updatePackage(){
   xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+  package["id"] = RoverState.id;
   package["distance"][0] = RoverState.distanceL;
   package["distance"][1] = RoverState.distanceR;
   package["yaw"] = RoverState.yaw;
