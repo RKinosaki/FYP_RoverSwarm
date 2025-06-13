@@ -7,20 +7,17 @@
 TaskHandle_t driveTaskHandle = nullptr;
 volatile int encoderCountL = 0;
 volatile int encoderCountR = 0;
-int prevCountR = 0;
-int prevCountL = 0;
-const float K_P = 0.6;
-const float K_D = 1;
-float prevError = 0;
-int basePWM = 96;
-const int maxPWM = 196;
-const float gain = 0.01;
-const int ethreshold = 90;
-const int dthreshold = 40;
-int prevDistL = 0;
-int prevDistR = 0;
-
 volatile bool controlFlag = false;
+int prevCount[2] = {0, 0}; //L, R
+const float GPD[3]={0.2, 0.4, 0.005}; //Gain, K_P, K_D constants for PD controller
+float prevError = 0;
+const int basePWM = 128;
+const int maxPWM = 196;
+const int threshold[2] = {80, 40}; //error margin, distance threshold
+const int avgFilterLength = 600;
+int prevDistL[avgFilterLength];
+int prevDistR[avgFilterLength];
+int avgL, avgR;
 
 // === INTERRUPT === //
 
@@ -63,31 +60,36 @@ void drive(){
     int distanceL = RoverState.distanceL;
     int distanceR = RoverState.distanceR;
     xSemaphoreGive(RoverState.mutex);
-    int error = distanceL-distanceR;
-    if(distanceL > 500){
-      distanceL = prevDistL;
+    float sumL = 0;
+    float sumR = 0;
+    //Moving average filter
+    for (int i = 0; i<avgFilterLength-1; i++){
+      prevDistL[i+1] = prevDistL[i];
+      prevDistR[i+1] = prevDistR[i];
     }
-    else if(distanceR > 500){
-      distanceR = prevDistR;
+    prevDistL[0] = distanceL;
+    prevDistR[0] = distanceR;
+    for (int i=0; i<avgFilterLength; i++){
+      sumL+=prevDistL[i];
+      sumR+=prevDistR[i];
     }
-    else{
-      prevDistL = distanceL;
-      prevDistR = distanceR;
-    }
-    if(error<ethreshold and error > -ethreshold){
+    avgL = sumL/avgFilterLength;
+    avgR = sumR/avgFilterLength;
+    int error = avgL-avgR;
+    if(error<threshold[0] and error > -threshold[0]){
       ledcWrite(0, 0);
       ledcWrite(1, basePWM);
       ledcWrite(2, basePWM);
       ledcWrite(3, 0);
     }
-    else if(distanceR< dthreshold and distanceL < dthreshold){
+    else if(distanceR< threshold[1] and distanceL < threshold[1]){
       ledcWrite(0, basePWM);
       ledcWrite(1, 0);
       ledcWrite(2, 0);
       ledcWrite(3, basePWM);
     }
     else{
-      float comp = gain*(K_P*error + K_D*((error-prevError)/HARDWARE_TIMER_PRESCALER));
+      float comp = GPD[0]*(GPD[1]*error + GPD[2]*((error-prevError)/HARDWARE_TIMER_PRESCALER));
       prevError = error;
       if(comp<0){
         ledcWrite(0 , 0);
@@ -145,21 +147,21 @@ void driveRover(void *pvParameters) {
       }
       float distanceR = (PI*TYRE_DIAMETER*encoderCountR)/(ENCODER_RES);
       float distanceL = -(PI*TYRE_DIAMETER*encoderCountL/(ENCODER_RES));
-      if(distanceR != prevCountR){
+      if(distanceR != prevCount[1]){
         // Serial.println("Right Encoder count is: ");
         // Serial.println(distanceR);
-        prevCountR = distanceR;
+        prevCount[1] = distanceR;
         xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
         RoverState.encoderR = distanceR;
         xSemaphoreGive(RoverState.mutex);
       }
-      if (distanceL != prevCountL){
+      if (distanceL != prevCount[0]){
         // Serial.println("Left Encoder count is: ");
         // Serial.println(distanceL);
         xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
         RoverState.encoderL = distanceL;
         xSemaphoreGive(RoverState.mutex);
-        prevCountL = distanceL;
+        prevCount[0] = distanceL;
       }
       TickType_t endTask = xTaskGetTickCount();
       Serial.println("DriveTask Timing");
