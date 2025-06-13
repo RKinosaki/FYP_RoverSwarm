@@ -6,6 +6,7 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 import threading
 from sklearn import linear_model
+from sklearn.linear_model import RANSACRegressor
 from sklearn.neighbors import NearestNeighbors
 
 ##create tcp socket
@@ -24,7 +25,7 @@ obstx_L = [[0, 0]]
 obstx_R = [[0, 0]]
 obsty_L = [[0, 0]]
 obsty_R = [[0, 0]]
-posx = [0, 0]
+posx = [150, 150]
 posy = [-150, -150]
 
 def checkquadrant(yaw, margin):
@@ -79,7 +80,7 @@ def sendCommand(connection, char):
     else:
         print("No rover connected")
         
-def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R): 
+def LinReg(obstx_L, obsty_L, obstx_R, obsty_R): 
     threshold = 6
     angle = math.pi/4
     lowangle = math.tan(angle)
@@ -95,10 +96,7 @@ def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R):
             if((lr_L.coef_[0]<lowangle and lr_L.coef_[0]>-lowangle) or lr_L.coef_[0] > highangle or lr_L.coef_[0]<-highangle):
                 print(lr_L.coef_[0])
                 line_y_L = lr_L.predict(arrX_L.reshape(-1, 1))
-                plt.plot(arrX_L, line_y_L, label = "Left Wall"+str(i), color='red')
-            else:
-                line_y_L = lr_L.predict(arrX_L.reshape(-1, 1))
-                plt.plot(arrX_L, line_y_L, label="Left Wall" + str(i), color='blue')
+                plt.plot(arrX_L, line_y_L, label = "Left Wall"+str(i), color='blue')
     for i in range(len(obstx_R)):
         if(len(obstx_R[i])>threshold or len(obsty_R[i])>threshold):
             # print(obstx_R[i][2:])
@@ -111,10 +109,40 @@ def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R):
                 print(lr_R.coef_[0])
                 line_y_R = lr_R.predict(arrX_R.reshape(-1, 1))
                 plt.plot(arrX_R, line_y_R, label="Right Wall" + str(i), color='red')
-            else:
-                line_y_R = lr_R.predict(arrX_R.reshape(-1, 1))
-                plt.plot(arrX_R, line_y_R, label="Right Wall" + str(i), color='blue')
     plt.title("Mapping data using linear regression")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.xlim(-x_end, x_end)
+    plt.ylim(-y_end, y_end)
+    plt.legend(loc = "lower right")
+    plt.show()
+
+def RANSAC(obstx_L, obsty_L, obstx_R, obsty_R): 
+    threshold = 6
+    angle = math.pi/4
+    lowangle = math.tan(angle)
+    highangle = math.tan((math.pi/2) - angle)
+    for i in range(len(obstx_L)):
+        if(len(obstx_L[i])>threshold or len(obsty_L[i])>threshold):
+            # print(obstx_L[i][2:])
+            # print(obsty_L[i][2:])
+            arrX_L = np.array(obstx_L[i][2:])
+            arrY_L = np.array(obsty_L[i][2:])
+            R_L = RANSACRegressor()
+            R_L.fit(arrX_L.reshape(-1, 1), arrY_L.reshape(-1, 1))
+            line_y_L = R_L.predict(arrX_L.reshape(-1, 1))
+            plt.plot(arrX_L, line_y_L, label="Left Wall" + str(i), color='blue')
+    for i in range(len(obstx_R)):
+        if(len(obstx_R[i])>threshold or len(obsty_R[i])>threshold):
+            # print(obstx_R[i][2:])
+            # print(obsty_R[i][2:])
+            arrX_R = np.array(obstx_R[i][2:])
+            arrY_R = np.array(obsty_R[i][2:])
+            R_R = RANSACRegressor()
+            R_R.fit(arrX_R.reshape(-1, 1), arrY_R.reshape(-1, 1))
+            line_y_R = R_R.predict(arrX_R.reshape(-1, 1))
+            plt.plot(arrX_R, line_y_R, label="Right Wall" + str(i), color='red')
+    plt.title("Mapping data using linear RANSAC")
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.xlim(-x_end, x_end)
@@ -219,7 +247,7 @@ def receiveData():
     prevQuadrant = 0
     prevTravelled = 0
     yaw_scaler = 15.7
-    yaw_0 = math.pi/2
+    yaw_0 = 0
     while True:
         print('waiting for connection')
         connection, client_address = sock.accept()
@@ -264,5 +292,6 @@ anim = FuncAnimation(fig, updatePlots, frames=None)
 plt.show()  
 showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
 createGrid(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
-# RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
+LinReg(obstx_L, obsty_L, obstx_R, obsty_R)
+RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
 
