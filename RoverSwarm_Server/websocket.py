@@ -39,7 +39,7 @@ def findPosition(coord, segment, yaw):
     nextPos = np.array((x, y))
     return np.vstack((coord, nextPos))
 
-def findObstaclePosition(coord, obst, yaw, side, bound=500):
+def findObstaclePosition(pastobst, coord, obst, yaw, side, bound=500):
     offset_left = 140
     offset_right = 50
     ##The ToF sensors are in a 45 degree angle so the cartesian coordinates are calculated below
@@ -48,24 +48,21 @@ def findObstaclePosition(coord, obst, yaw, side, bound=500):
         if(obst<bound):
             x = coord[-1][0]+obst*math.cos(((offset_left*math.pi)/180)-yaw)
             y = coord[-1][1]+obst*math.sin(((offset_left*math.pi)/180)-yaw)
+            nextObst = np.array((x, y))
         else:
-            x = 0
-            y = 0
-        nextObst = np.array((x, y))
+            return pastobst
+        
     elif(side=="R"):
         if(obst<bound):
             x = coord[-1][0]+obst*math.cos(((offset_right*math.pi)/180)-yaw)
             y = coord[-1][1]+obst*math.sin(((offset_right*math.pi)/180)-yaw)
+            nextObst = np.array((x, y))
         else:
-            x = 0
-            y = 0
-        nextObst = np.array((x, y))
+            return pastobst
     else:
         print("Side not correct!")
-        x = 0
-        y = 0
-        nextObst = np.array((x, y))
-    return np.vstack((coord, nextObst))
+        return pastobst
+    return np.vstack((pastobst, nextObst))
     
 def initialiseData():
     R1 = roverData(1, 0, 0, 0)
@@ -105,8 +102,8 @@ def receiveData(sock, R, graphs, axFig):
                         Rov.pos = findPosition(Rov.pos, segment, Rov.yaw)
                         prevTravelled[id] = travelled
                         ##Find the obstacle positions
-                        Rov.obstL = findObstaclePosition(Rov.pos, data["distance"][0], Rov.yaw, "L")
-                        Rov.obstR = findObstaclePosition(Rov.pos, data["distance"][1], Rov.yaw, "R")
+                        Rov.obstL = findObstaclePosition(Rov.obstL, Rov.pos, data["distance"][0], Rov.yaw, "L")
+                        Rov.obstR = findObstaclePosition(Rov.obstR, Rov.pos, data["distance"][1], Rov.yaw, "R")
                         with dataLock:
                             newData = True
                             RovID = id

@@ -26,8 +26,8 @@ def updatePlots(roverClass, graphs, axFig):
     fig, ax = axFig[0], axFig[1]
     ax.plot(roverClass.pos[-2:-1, 0], roverClass.pos[-2:-1, 1], marker='.', c='red')
     graphs[2].set_offsets(roverClass.pos)
-    graphs[1].set_offsets(roverClass.obstR[-1]) 
-    graphs[0].set_offsets(roverClass.obstL[-1])
+    graphs[1].set_offsets(roverClass.obstR) 
+    graphs[0].set_offsets(roverClass.obstL)
     fig.canvas.draw_idle()
     fig.canvas.flush_events()
 
