@@ -64,11 +64,7 @@ def findObstaclePosition(pastobst, coord, obst, yaw, side, bound=500):
         print("Side not correct!")
         return pastobst
     return np.vstack((pastobst, nextObst))
-    
-def initialiseData():
-    R1 = roverData(1, 0, 0, 0, 'red')
-    R2 = roverData(2, 1, 2, 3, 'black')
-    return (R1, R2)
+
 
 def formatData(line):
     print(line)

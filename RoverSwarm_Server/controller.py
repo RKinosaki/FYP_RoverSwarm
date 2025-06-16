@@ -2,11 +2,14 @@ import websocket as web
 import threading
 import visualiser as v
 import dataProcessing as dProc
+import math
 
 bound = [300, 300]
 
 sock = web.startTCP()
-R = web.initialiseData()
+R1 = web.roverData(1, 150, -150, math.pi/2, 'red')
+R2 = web.roverData(2, -150, 150, 0, 'black')
+R = [R1, R2]
 graphs, axFig = v.initVisualiser(R, bound)
 
 thread = threading.Thread(target=web.receiveData, args=(sock, R, graphs, axFig), daemon=True)
@@ -24,7 +27,7 @@ except KeyboardInterrupt:
 
     dProc.showpointcloud(R[0], bound)
     allPoints = dProc.showFilteredPointCloud(R[0], bound)
-    dProc.createGrid(bound, allPoints)
+    dProc.createGrid(allPoints)
 
 # LinReg(obstx_L, obsty_L, obstx_R, obsty_R)
 # RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
