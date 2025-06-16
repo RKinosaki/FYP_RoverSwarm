@@ -159,7 +159,7 @@ def createGrid(allPoints):
 
         
         plt.imshow(grid[::-1], cmap='binary', extent=[x_min, x_max, y_min, y_max])
-        plt.title("Filtered data of time of flight data")
+        plt.title("Grid data of time of flight data")
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.grid(True)
@@ -168,3 +168,19 @@ def createGrid(allPoints):
     except UnboundLocalError as e:
         print("No value!")
     return grid
+
+def createFilteredGrid(grid):
+    fig, ax = plt.subplots()
+    y, x = np.where(grid==1)
+    gridPoints = np.vstack((x, y)).T
+    filteredPoints = filterLonePoints(gridPoints, 2, 2)
+    filteredGrid = np.zeros_like(grid)
+    for x,y in filteredPoints:
+        filteredGrid[y, x] = 1
+    plt.imshow(filteredGrid[::-1], cmap='binary')
+    plt.title("Grid data of filtered time of flight data")
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.grid(True)
+    plt.show()
+    input("Press enter to continue...")

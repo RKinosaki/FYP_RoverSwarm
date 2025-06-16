@@ -28,7 +28,7 @@ except KeyboardInterrupt:
 dProc.showpointcloud(R[0], bound)
 allPoints = dProc.showFilteredPointCloud(R[0], bound)
 gridPoints = dProc.createGrid(allPoints)
-print(gridPoints)
+gridPoints = dProc.createFilteredGrid(gridPoints)
 
 # LinReg(obstx_L, obsty_L, obstx_R, obsty_R)
 # RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  
