@@ -184,3 +184,4 @@ def createFilteredGrid(grid):
     plt.grid(True)
     plt.show()
     input("Press enter to continue...")
+    exit()

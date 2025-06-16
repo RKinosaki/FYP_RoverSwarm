@@ -13,7 +13,7 @@ const float GPD[3]={0.2, 0.1, 0.001}; //Gain, K_P, K_D constants for PD controll
 float prevError = 0;
 const int basePWM = 96;
 const int maxPWM = 160;
-const int threshold[2] = {70, 40}; //error margin, distance threshold
+const int threshold[2] = {50, 40}; //error margin, distance threshold
 const int avgFilterLength = 10;
 int prevDistL[avgFilterLength];
 int prevDistR[avgFilterLength];
