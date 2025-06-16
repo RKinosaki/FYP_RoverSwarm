@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
 import websocket as web
 import threading
 import visualiser as v
+import dataProcessing as dProc
 
 bound = [300, 300]
 
@@ -22,7 +22,9 @@ except KeyboardInterrupt:
     print("Shutting down...")
 
 
-# showpointcloud(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
-# createGrid(obstx_L, obsty_L, obstx_R, obsty_R, posx, posy)
+    dProc.showpointcloud(R[0], bound)
+    allPoints = dProc.showFilteredPointCloud(R[0], bound)
+    dProc.createGrid(allPoints)
+
 # LinReg(obstx_L, obsty_L, obstx_R, obsty_R)
 # RANSAC(obstx_L, obsty_L, obstx_R, obsty_R)  

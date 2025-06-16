@@ -15,13 +15,14 @@ This file is meant to connect to the rover, receive the raw data to find the pos
 """
 
 class roverData:
-    def __init__(self, id = 1, startx = 0, starty = 0, yaw_0 = 0):
+    def __init__(self, id = 1, startx = 0, starty = 0, yaw_0 = 0, pathC='red'):
         self.id = id
         self.pos = np.array([(startx, starty)])
         self.yaw0 = yaw_0
         self.yaw = yaw_0
         self.obstL = np.array(np.zeros((1, 2)))
         self.obstR = np.array(np.zeros((1, 2)))
+        self.pathColor = pathC
 
 def startTCP():
     ##create tcp socket
@@ -65,8 +66,8 @@ def findObstaclePosition(pastobst, coord, obst, yaw, side, bound=500):
     return np.vstack((pastobst, nextObst))
     
 def initialiseData():
-    R1 = roverData(1, 0, 0, 0)
-    R2 = roverData(2, 1, 2, 3)
+    R1 = roverData(1, 0, 0, 0, 'red')
+    R2 = roverData(2, 1, 2, 3, 'black')
     return (R1, R2)
 
 def formatData(line):
