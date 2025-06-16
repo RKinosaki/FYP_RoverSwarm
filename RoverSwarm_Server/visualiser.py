@@ -13,7 +13,7 @@ def initVisualiser(roverClass, bound=[300, 300]):
         try:
             wallL = ax.scatter(rov.obstL[:,0], rov.obstL[:,1], marker = '.', s=1, c='blue')
             wallR = ax.scatter(rov.obstR[:, 0], rov.obstR[:,1], marker = '.', s=1, c='green')
-            posgraph = ax.scatter(rov.pos[:, 0], rov.pos[:, 1], marker='.', s=100, c='red')
+            posgraph = ax.scatter(rov.pos[:, 0], rov.pos[:, 1], marker='.', s=100, c=rov.pathColor)
         except ValueError:
             print("Data not found!")
         graphAttr = [wallL, wallR, posgraph]

@@ -167,3 +167,4 @@ def createGrid(allPoints):
         input("Press enter to continue...")
     except UnboundLocalError as e:
         print("No value!")
+    return grid
