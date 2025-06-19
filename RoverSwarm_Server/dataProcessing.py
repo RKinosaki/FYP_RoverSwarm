@@ -104,12 +104,12 @@ def showpointcloud(R, bound):
     plt.xlim(-bound[0], bound[0])
     plt.ylim(-bound[1], bound[1])
     allgraph=[]
-    # for rov in R:
-    rov = R
-    wall_L = ax.scatter(rov.obstL[:, 0], rov.obstL[:, 1], marker='.', s=1, label = "left side", c='blue')
-    wall_R = ax.scatter(rov.obstR[:, 0], rov.obstR[:, 1], marker = '.', s=1, label = "right side", c='green') 
-    posgraph = ax.plot(rov.pos[:, 0], rov.pos[:, 1], label='path', c=rov.pathColor)
-    allgraph.append([wall_L, wall_R, posgraph])
+    for rov in R:
+    # rov = R
+        wall_L = ax.scatter(rov.obstL[:, 0], rov.obstL[:, 1], marker='.', s=1, label = "left side", c='blue')
+        wall_R = ax.scatter(rov.obstR[:, 0], rov.obstR[:, 1], marker = '.', s=1, label = "right side", c='green') 
+        posgraph = ax.plot(rov.pos[:, 0], rov.pos[:, 1], label='path', c=rov.pathColor)
+        allgraph.append([wall_L, wall_R, posgraph])
     plt.title("Raw data of the time of flight sensor")
     plt.xlabel('X')
     plt.ylabel('Y')
@@ -122,17 +122,17 @@ def showFilteredPointCloud(R, bound):
     fig, ax = plt.subplots()
     plt.xlim(-bound[0], bound[0])
     plt.ylim(-bound[1], bound[1])
-    # for rov in R:
-    rov = R
-    allPoints = np.vstack((rov.obstL, rov.obstR))
-    allPoints = filterLonePoints(allPoints, 50, 5) ##Neighbourhood search
-    allPoints = removePointsInPath(allPoints, rov.pos, 20) ##Removes any point in path
-    try:
-        wall = ax.scatter(allPoints[:, 0], allPoints[:, 1], marker='.', s=1, label = "Rover "+str(rov.id), c='blue')
-        posgraph = ax.plot(rov.pos[:, 0], rov.pos[:, 1], label='path', c=rov.pathColor)
-        allgraph.append([wall, posgraph])
-    except IndexError as e:
-        print("Error Indexing: ", e)
+    for rov in R:
+        # rov = R
+        allPoints = np.vstack((rov.obstL, rov.obstR))
+        allPoints = filterLonePoints(allPoints, 50, 5) ##Neighbourhood search
+        allPoints = removePointsInPath(allPoints, rov.pos, 20) ##Removes any point in path
+        try:
+            wall = ax.scatter(allPoints[:, 0], allPoints[:, 1], marker='.', s=1, label = "Rover "+str(rov.id), c='blue')
+            posgraph = ax.plot(rov.pos[:, 0], rov.pos[:, 1], label='path', c=rov.pathColor)
+            allgraph.append([wall, posgraph])
+        except IndexError as e:
+            print("Error Indexing: ", e)
     plt.title("Filtered data of the time of flight sensor")
     plt.xlabel('X')
     plt.ylabel('Y')

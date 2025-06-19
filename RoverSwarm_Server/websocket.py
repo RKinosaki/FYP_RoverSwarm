@@ -6,9 +6,8 @@ import visualiser as v
 import threading
 
 dataLock = threading.Lock()
-newData = False
-RovID = 0
-
+activeConnections = []
+running = True
 
 """
 This file is meant to connect to the rover, receive the raw data to find the position, and its obstacle
@@ -73,38 +72,58 @@ def formatData(line):
     print("Parsed JSON:", data)
     return data
 
-def receiveData(sock, R, graphs, axFig):
-    global newData, RovID
+def receiveData(sock, R):
+    global activeConnections, running
+    print("Waiting for rover connections...")
+    while running:
+        connection, client_address = sock.accept()
+        print('connection from', client_address)
+        activeConnections.append(connection)
+        print(activeConnections)
+        handlerThread = threading.Thread(target=handleData, args=(connection, R), daemon=True)
+        handlerThread.start()
+
+def closeAllConnections():
+    global activeConnections, running
+    running = False
+    for conn in activeConnections:
+        try:
+            conn.shutdown(socket.SHUT_RDWR)
+            conn.close()
+        except Exception as e:
+            print("Error")
+    activeConnections = []
+    socket.close()
+
+def handleData(connection, R):
+    global newDataFlags, running
     prevTravelled = np.array([0, 0, 0])
     travelled = np.array([0, 0, 0])
     yaw_scaler = 15.7
-    while True:
-        print('waiting for connection')
-        connection, client_address = sock.accept()
-        print('connection from', client_address)
-        try:  
-            with connection.makefile('r') as f:
-                for line in f:
-                    try:
-                        data = formatData(line)
-                        id = int(data["id"])-1
-                        ##Picks the rover from the id data
-                        Rov = R[id]
-                        ##Take the average of the encoder
-                        travelled = (data["encoder"][0]+data["encoder"][1])/2
-                        segment = travelled-prevTravelled[id]
-                        ## Yaw = Yaw0 + Measured Yaw
-                        Rov.yaw = Rov.yaw0 + yaw_scaler*data["yaw"]
-                        ##Calculate position and add to np list
-                        Rov.pos = findPosition(Rov.pos, segment, Rov.yaw)
-                        prevTravelled[id] = travelled
-                        ##Find the obstacle positions
-                        Rov.obstL = findObstaclePosition(Rov.obstL, Rov.pos, data["distance"][0], Rov.yaw, "L")
-                        Rov.obstR = findObstaclePosition(Rov.obstR, Rov.pos, data["distance"][1], Rov.yaw, "R")
-                        with dataLock:
-                            newData = True
-                            RovID = id
-                    except json.JSONDecodeError as e:
-                        print("JSON Decode Error:", e)
-        finally:
-            connection.close()    
+    try:  
+        with connection.makefile('r') as f:
+            for line in f:
+                if not running:
+                    break
+                try:
+                    data = formatData(line)
+                    id = int(data["id"])-1
+                    ##Picks the rover from the id data
+                    Rov = R[id]
+                    ##Take the average of the encoder
+                    travelled = (data["encoder"][0]+data["encoder"][1])/2
+                    segment = travelled-prevTravelled[id]
+                    ## Yaw = Yaw0 + Measured Yaw
+                    Rov.yaw = Rov.yaw0 + yaw_scaler*data["yaw"]
+                    ##Calculate position and add to np list
+                    Rov.pos = findPosition(Rov.pos, segment, Rov.yaw)
+                    prevTravelled[id] = travelled
+                    ##Find the obstacle positions
+                    Rov.obstL = findObstaclePosition(Rov.obstL, Rov.pos, data["distance"][0], Rov.yaw, "L")
+                    Rov.obstR = findObstaclePosition(Rov.obstR, Rov.pos, data["distance"][1], Rov.yaw, "R")
+                    with dataLock:
+                        newDataFlags[id] = True
+                except json.JSONDecodeError as e:
+                    print("JSON Decode Error:", e)
+    finally:
+        connection.close()    

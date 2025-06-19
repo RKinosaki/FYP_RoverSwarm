@@ -8,8 +8,6 @@
 #include <Adafruit_Sensor.h>
 #include <MPU6050_light.h>
 
-
-
 extern VL53L1X ToF_L, ToF_R;
 extern TCA9548A I2CMux;
 extern Adafruit_MPU6050 imu;  //Initialise Object

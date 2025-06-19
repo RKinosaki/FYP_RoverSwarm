@@ -26,7 +26,7 @@ void ledIndicate(void *pvParameter);
 
 /*<-----    Shared variables    ----->*/
 struct sysState {
-    const uint8_t id = 1;
+    const uint8_t id = 2;
     volatile float distanceL = 0;
     volatile float distanceR = 0;
     volatile float yaw = 0;

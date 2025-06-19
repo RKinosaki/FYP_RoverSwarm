@@ -27,7 +27,7 @@
 #define I2C_PRIORITY 1
 #define EN_TOF_R true
 #define EN_TOF_L true
-#define EN_IMU true
+#define EN_IMU false
 
 // PHOTON task
 #define PHOTON_ENABLE false
@@ -66,12 +66,12 @@
 
 // Channel Pins
 #define Channel_ToF_L 7
-#define Channel_ToF_R 4
+#define Channel_ToF_R 4 //6 for mk3
 #define Channel_IMU 3
 
 //LED Pin
 
-#define LED_PIN 8
+#define LED_PIN 18
 
 
 //Tyre Parameters
