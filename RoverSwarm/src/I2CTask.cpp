@@ -26,9 +26,11 @@ void measureDistR() {
       Serial.print(" TIMEOUT");
       distanceR = -1;
   }
-  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-  RoverState.distanceR = distanceR;
-  xSemaphoreGive(RoverState.mutex);
+  if (distanceR<500){
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.distanceR = distanceR;
+    xSemaphoreGive(RoverState.mutex);
+  }
   I2CMux.closeChannel(Channel_ToF_R);
 }
 
@@ -39,9 +41,11 @@ void measureDistL() {
     Serial.print(" TIMEOUT");
     Serial.println();
   }
-  xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
-  RoverState.distanceL = distanceL;
-  xSemaphoreGive(RoverState.mutex);
+  if (distanceL < 800){
+    xSemaphoreTake(RoverState.mutex, portMAX_DELAY);
+    RoverState.distanceL = distanceL;
+    xSemaphoreGive(RoverState.mutex);
+  }
   I2CMux.closeChannel(Channel_ToF_L);
 }
 

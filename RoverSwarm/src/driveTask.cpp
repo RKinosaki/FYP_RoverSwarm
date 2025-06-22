@@ -9,12 +9,12 @@ volatile int encoderCountL = 0;
 volatile int encoderCountR = 0;
 volatile bool controlFlag = false;
 int prevCount[2] = {0, 0}; //L, R
-const float GPD[3]={0.2, 0.1, 0.001}; //Gain, K_P, K_D constants for PD controller
+const float GPD[3]={0.002, 0.001, 0.00001}; //Gain, K_P, K_D constants for PD controller
 float prevError = 0;
-const int basePWM = 96;
-const int maxPWM = 160;
-const int threshold[2] = {50, 40}; //error margin, distance threshold
-const int avgFilterLength = 10;
+const int basePWM = 128;
+const int maxPWM = 200;
+const int threshold[2] = {90, 40}; //error margin, distance threshold
+const int avgFilterLength = 20;
 int prevDistL[avgFilterLength];
 int prevDistR[avgFilterLength];
 int avgL, avgR;
@@ -78,6 +78,7 @@ void drive(){
     int avgError = avgL-avgR;
     int error = distanceL-distanceR;
     if(avgError<threshold[0] and avgError > -threshold[0]){
+      //go forward
       ledcWrite(0, 0);
       ledcWrite(1, basePWM);
       ledcWrite(2, basePWM);

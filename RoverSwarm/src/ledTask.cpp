@@ -52,7 +52,7 @@ void ledIndicate(void *pvParameters) {
         }
         else{
             count = 0;
-            pinMode(LED_PIN, LOW);
+            pinMode(LED_PIN, HIGH);
         }
         TickType_t endTask = xTaskGetTickCount();
       Serial.println("LEDTask Timing");

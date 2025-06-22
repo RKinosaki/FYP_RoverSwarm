@@ -7,7 +7,7 @@
 #define HARDWARE_TIMER_PRESCALER 80
 
 // LED Task
-#define LED_ENABLE false
+#define LED_ENABLE true
 #define LED_FREQ 1
 #define LED_PRIORITY 5
 
@@ -17,17 +17,17 @@
 #define ORIENTATION_BANDWIDTH MPU6050_BAND_21_HZ
 
 //SendData Task
-#define SEND_DATA true
+#define SEND_DATA false
 #define DATA_FREQ 6
 #define DATA_PRIORITY 3
 
 // I2C task
 #define I2C_ENABLE true
-#define I2C_FREQ 10
+#define I2C_FREQ 6
 #define I2C_PRIORITY 1
 #define EN_TOF_R true
 #define EN_TOF_L true
-#define EN_IMU false
+#define EN_IMU true
 
 // PHOTON task
 #define PHOTON_ENABLE false
@@ -66,7 +66,7 @@
 
 // Channel Pins
 #define Channel_ToF_L 7
-#define Channel_ToF_R 4 //6 for mk3
+#define Channel_ToF_R 6 //6 for mk4, 4 for mk3
 #define Channel_IMU 3
 
 //LED Pin

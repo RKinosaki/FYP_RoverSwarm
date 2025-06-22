@@ -23,9 +23,15 @@ class roverData:
         self.obstR = np.array(np.zeros((1, 2)))
         self.pathColor = pathC
 
+def monitor_input():
+    global running
+    input("Press Enter to Stop...\n")
+    running = False
+
 def startTCP():
     ##create tcp socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
     ##address found from the ip seen on phone hotspot
     server_address = ('0.0.0.0', 50)
     print("starting up on: ", server_address)
@@ -76,12 +82,16 @@ def receiveData(sock, R):
     global activeConnections, running
     print("Waiting for rover connections...")
     while running:
-        connection, client_address = sock.accept()
-        print('connection from', client_address)
-        activeConnections.append(connection)
-        print(activeConnections)
-        handlerThread = threading.Thread(target=handleData, args=(connection, R), daemon=True)
-        handlerThread.start()
+        try:
+            connection, client_address = sock.accept()
+            print('connection from', client_address)
+            activeConnections.append(connection)
+            handlerThread = threading.Thread(target=handleData, args=(connection, R), daemon=True)
+            handlerThread.start()
+        except socket.timeout:
+            continue
+        except OSError:
+            break
 
 def closeAllConnections():
     global activeConnections, running
@@ -93,13 +103,12 @@ def closeAllConnections():
         except Exception as e:
             print("Error")
     activeConnections = []
-    socket.close()
 
 def handleData(connection, R):
     global newDataFlags, running
     prevTravelled = np.array([0, 0, 0])
     travelled = np.array([0, 0, 0])
-    yaw_scaler = 15.7
+    yaw_scaler = np.array([15.7, 15.7, -15.7])
     try:  
         with connection.makefile('r') as f:
             for line in f:
@@ -114,7 +123,10 @@ def handleData(connection, R):
                     travelled = (data["encoder"][0]+data["encoder"][1])/2
                     segment = travelled-prevTravelled[id]
                     ## Yaw = Yaw0 + Measured Yaw
-                    Rov.yaw = Rov.yaw0 + yaw_scaler*data["yaw"]
+                    if(id==3):
+                        Rov.yaw = Rov.yaw0 + yaw_scaler[id]*data["yaw"]
+                    else:
+                        Rov.yaw = Rov.yaw0 - yaw_scaler[id]*data["yaw"]
                     ##Calculate position and add to np list
                     Rov.pos = findPosition(Rov.pos, segment, Rov.yaw)
                     prevTravelled[id] = travelled
